@@ -2,6 +2,8 @@ create schema fb_db;
 
 use fb_db;
 
+/* TABLES -----------------------------------------------------*/
+
 create table users (
 	id int PRIMARY KEY AUTO_INCREMENT,
     fullName nvarchar(100) NOT NULL,
@@ -88,3 +90,59 @@ INSERT INTO users (fullName, gender, birthDate, maritalStatus, city, country, em
 ('Tomás Correia', 'M', '2002-01-22', 'S', 'Évora', 'Portugal', 'tomas.correia02@gmail.com', '916677889'),
 ('Helena Batista', 'F', '1973-09-05', 'W', 'Beja', 'Portugal', 'hbatista73@hotmail.com', '931122334');
 
+
+INSERT INTO posts (idUser, postDate, postText) VALUES
+(2, '2026-05-01 10:30:00', 'Bom dia! Alguém conhece um bom restaurante no Porto para o fim de semana?'),
+(5, '2026-05-01 14:15:00', 'Finalmente de férias! Algarve, aqui vou eu.'),
+(12, '2026-05-01 19:45:00', 'Alguém já viu o novo filme que estreou ontem? Vale a pena ir ao cinema?'),
+(1, '2026-05-02 08:20:00', 'Que trânsito horrível na Segunda Circular hoje... Fiquei parado 40 minutos.'),
+(20, '2026-05-02 11:10:00', 'A tentar aprender bases de dados relacionais e SQL. Alguma dica para iniciantes?'),
+(8, '2026-05-02 18:00:00', 'O tempo está perfeito para uma corrida no paredão de Cascais.'),
+(30, '2026-05-03 09:30:00', 'Adotei um gatinho novo! Apresento-vos o Tareco'),
+(15, '2026-05-03 13:00:00', 'Alguém com disponibilidade para ir beber um café logo à tarde pelo centro?'),
+(4, '2026-05-03 22:15:00', 'Vitória incrível do nosso clube ontem! Que grande jogo de futebol.'),
+(18, '2026-05-04 09:00:00', 'A trabalhar remotamente hoje. O silêncio é de ouro para a concentração.'),
+(22, '2026-05-04 12:30:00', 'Estou a precisar de uma série nova. Qual é a vossa favorita da atualidade?'),
+(10, '2026-05-04 14:00:00', 'Fim de semana em família. Muito bom para recarregar baterias para a nova semana.'),
+(25, '2026-05-04 15:45:00', 'A fotografia que tirei ontem na serra da Arrábida ficou brutal! A natureza é incrível.'),
+(14, '2026-05-04 18:20:00', 'Receita nova testada e aprovada: bacalhau com natas divinal. Quem quer a receita?'),
+(7, '2026-05-04 19:10:00', 'Alguém sabe onde posso consertar o ecrã do telemóvel a um preço acessível? Caiu-me hoje...');
+
+
+INSERT INTO comments (idPost, idUser, commentDate, parentCommentId, commentText) VALUES
+(1, 10, '2026-05-01 10:45:00', NULL, 'Experimenta a Adega São Nicolau, a comida tradicional deles é excelente!'),
+(1, 2, '2026-05-01 11:05:00', 1, 'Obrigado pela dica! Fica muito caro ou é acessível?'),
+(2, 26, '2026-05-01 15:00:00', NULL, 'Aproveita bem as férias Inês, bem mereces esse descanso!'),
+(5, 11, '2026-05-02 11:30:00', NULL, 'Pratica muitos exercícios diretamente no Workbench, a teoria não chega.'),
+(7, 12, '2026-05-03 09:45:00', NULL, 'Ohhh, que fofo! Tens de partilhar fotografias do Tareco connosco.'),
+(7, 30, '2026-05-03 09:50:00', 5, 'Vou enviar-te umas fotos agora mesmo por mensagem privada!'),
+(14, 3, '2026-05-04 18:30:00', NULL, 'Eu quero!! Partilha a receita aqui connosco, por favor.'),
+(11, 9, '2026-05-04 12:45:00', NULL, 'Estou viciado em The Bear, tens mesmo de dar uma oportunidade a essa série.'),
+(8, 1, '2026-05-03 13:15:00', NULL, 'Eu alinho! Encontramo-nos na Baixa por volta das 17h?'),
+(15, 17, '2026-05-04 19:30:00', NULL, 'Há uma loja fixe na rua direita que te repara isso na hora.');
+
+
+INSERT INTO posts_likes (idUser, idPost, likeDate) VALUES
+(2, 14, '2026-05-04 18:25:00'),
+(10, 1, '2026-05-01 10:40:00'),
+(26, 2, '2026-05-01 14:50:00'),
+(1, 5, '2026-05-02 11:15:00'),
+(11, 5, '2026-05-02 11:18:00'),
+(12, 7, '2026-05-03 09:35:00'),
+(20, 7, '2026-05-03 09:40:00'),
+(3, 14, '2026-05-04 18:22:00'),
+(9, 11, '2026-05-04 12:40:00'),
+(17, 15, '2026-05-04 19:15:00');
+
+
+INSERT INTO comments_likes (idUser, idComment, likeDate) VALUES
+(2, 1, '2026-05-01 10:50:00'),
+(10, 2, '2026-05-01 11:10:00'),
+(5, 3, '2026-05-01 15:30:00'),
+(20, 4, '2026-05-02 11:45:00'),
+(30, 5, '2026-05-03 09:48:00'),
+(12, 6, '2026-05-03 09:55:00'),
+(14, 7, '2026-05-04 18:45:00'),
+(22, 8, '2026-05-04 13:00:00'),
+(15, 9, '2026-05-03 13:30:00'),
+(7, 10, '2026-05-04 19:35:00');
