@@ -21,6 +21,6 @@ router.post('/request', authJWT(), createFriendRequest);
 router.put('/update', authJWT(), updateFriendshipStatus);
 
 /*router.delete('/delete/:userId/:friendId', authJWT(), deleteFriendship);*/
-router.delete('/delete/:friendId', authJWT(), deleteFriendship);
+router.delete('/delete/:id', authJWT(), deleteFriendship);
 
 module.exports = router;

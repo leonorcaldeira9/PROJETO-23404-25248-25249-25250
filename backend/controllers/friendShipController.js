@@ -102,7 +102,7 @@ const deleteFriendship = (req, res) => {
     if (!userId || !friendId) return res.status(400).send();*/
 
     const userId = req.user.id;
-    const { friendId } = req.params;
+    const friendId = req.params.id;
 
     if (!friendId) {
         return res.status(400).json({ error: "The friend's ID id required." });

@@ -1,22 +1,47 @@
 const PostLikeModel = require('../models/PostLikeModel');
+const {getPostById} = require("../models/postModel");
+const {checkIfFriends} = require("../models/friendShipModel");
+
+
 
 const addLike = (req, res) => {
     const idUser = req.user.id;
     const { idPost } = req.body;
 
-    /*const { idUser, idPost } = req.body;*/
-    /*if (!idUser || !idPost) return res.status(400).send();*/
-
     if (!idPost) {
         return res.status(400).json({ error: "The post ID is required." });
     }
 
-    PostLikeModel.addLike(idUser, idPost, (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: "Error adding like." });
-        }
+    const addLikeFunc = () => {
+        PostLikeModel.addLike(idUser, idPost, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: "Error adding like." });
+            }
 
-        return res.status(201).json({ message: "Like added successfully." });
+            return res.status(201).json({ message: "Like added successfully." });
+        });
+    };
+
+    getPostById(idPost, (err, postArray) => {
+        if (err) return res.status(500).json({ error: "Database error." });
+        if (postArray.length === 0) return res.status(404).json({ error: "Post not found." });
+
+        const targetPost = postArray[0];
+
+        if (targetPost.visibility === 'pr' && targetPost.idUser !== idUser) {
+
+            checkIfFriends(idUser, targetPost.idUser, (err, areFriends) => {
+                if (err) return res.status(500).json({ error: "Error checking permissions." });
+
+                if (!areFriends) {
+                    return res.status(403).json({ error: "This post is private. You cannot like it." });
+                }
+
+                addLikeFunc();
+            });
+        } else {
+            addLikeFunc();
+        }
     });
 };
 

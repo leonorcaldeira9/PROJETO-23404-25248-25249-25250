@@ -17,14 +17,13 @@ const PostModel = {
     },
 
     createPost: (postData, callback) => {
-        const { idUser, postText } = postData;
-        const sql = 'INSERT INTO posts (idUser, postText) VALUES (?, ?)';
-        db.query(sql, [idUser, postText], callback);
+        const sql = 'INSERT INTO posts (idUser, postText, visibility) VALUES (?, ?, ?)';
+        db.query(sql, [postData.idUser, postData.postText, postData.vis], callback);
     },
 
-    updatePost: (id, postText, callback) => {
-        const sql = 'UPDATE posts SET postText=? WHERE id=?';
-        db.query(sql, [postText, id], callback);
+    updatePost: (id, postText, vis, callback) => {
+        const sql = 'UPDATE posts SET postText=?, visibility = ? WHERE id=?';
+        db.query(sql, [postText, vis, id], callback);
     },
 
     deletePost: (id, callback) => {

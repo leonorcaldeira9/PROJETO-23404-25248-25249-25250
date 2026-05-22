@@ -1,7 +1,28 @@
 const PostModel = require('../models/postModel');
+const {checkIfFriends} = require("../models/friendShipModel");
+const {getUserById} = require("../models/userModel");
+
+/*const getPostById = (req, res) => {
+    const id = req.params.id;
+
+    if (!id) {
+        return res.status(400).json({ error: "User ID is required." });
+    }
+
+    PostModel.getPostById(id, (err, post) => {
+        if (err) {
+            return res.status(500).json({ error: "Database error." });
+        }
+        if (post.length === 0) {
+            return res.status(404).json({ error: "Post not found." });
+        }
+        return res.status(200).json(post[0]);
+    });
+};*/
 
 const getPostById = (req, res) => {
     const id = req.params.id;
+    const idLoggedInUser = req.user.id;
     /*if (id === undefined) {
         return res.status(400).send();
     }*/
@@ -17,11 +38,37 @@ const getPostById = (req, res) => {
         if (post.length === 0) {
             return res.status(404).json({ error: "Post not found." });
         }
-        return res.status(200).json(post[0]);
+
+        const targetPost = post[0];
+
+        if (targetPost.idUser === idLoggedInUser) {
+            return res.status(200).json(targetPost);
+        }
+
+        getUserById(targetPost.idUser, (err, user) => {
+            if (err) return res.status(500).json({ error: "Error checking user profile." });
+
+            const authorProfile = user[0];
+
+            if (authorProfile.privacy === 'pr' || targetPost.visibility === 'pr') {
+
+                checkIfFriends(idLoggedInUser, targetPost.idUser, (err, areFriends) => {
+                    if (err) return res.status(500).json({ error: "Error checking permissions." });
+
+                    if (!areFriends) {
+                        return res.status(403).json({ error: "Access denied. Private account or post." });
+                    }
+
+                    return res.status(200).json(targetPost);
+                });
+            } else {
+                return res.status(200).json(targetPost);
+            }
+        });
     });
 };
 
-const getPostsByUser = (req, res) => {
+/*const getPostsByUser = (req, res) => {
     const id = req.params.id;
 
     if (!id) {
@@ -38,7 +85,49 @@ const getPostsByUser = (req, res) => {
 
         return res.status(200).json(posts);
     })
-}
+}*/
+
+const getPostsByUser = (req, res) => {
+    const idTargetUser = req.params.id;
+    const idLoggedInUser = req.user.id;
+
+    if (!idTargetUser) {
+        return res.status(400).json({ error: "User ID is required." });
+    }
+
+    getUserById(idTargetUser, (err, userArray) => {
+        if (err) return res.status(500).json({ error: "Error checking user profile." });
+        if (userArray.length === 0) return res.status(404).json({ error: "User not found." });
+
+        const targetUser = userArray[0];
+        const isSameUser = parseInt(idTargetUser) === idLoggedInUser;
+
+        checkIfFriends(idLoggedInUser, idTargetUser, (err, areFriends) => {
+            if (err) return res.status(500).json({ error: "Error checking friendship." });
+
+            if (targetUser.privacy === 'pr' && !areFriends && !isSameUser) {
+                return res.status(403).json({ error: "This account is private. Only friends can see posts." });
+            }
+
+            PostModel.getPostsByUser(idTargetUser, (err, posts) => {
+                if (err) {
+                    return res.status(500).json({ error: "Database error." });
+                }
+
+                if (posts.length === 0) {
+                    return res.status(200).json([]);
+                }
+
+                if (areFriends || isSameUser) {
+                    return res.status(200).json(posts);
+                } else {
+                    const publicPosts = posts.filter(post => post.visibility === 'pu');
+                    return res.status(200).json(publicPosts);
+                }
+            });
+        });
+    });
+};
 
 const getPosts = (req, res) => {
     PostModel.getPosts((err, posts) => {
@@ -52,13 +141,22 @@ const getPosts = (req, res) => {
 
 const createPost = (req, res) => {
     const idUser = req.user.id;
-    const { postText } = req.body;
+    const { postText, visibility } = req.body;
 
     if (!postText) {
         return res.status(400).json({ error: "The text of the post is required." });
     }
 
-    const postData = { idUser, postText };
+    let vis = visibility;
+
+    if (vis===undefined || vis===null){
+         vis='pu';
+    }
+    else if (vis !== 'pu' && vis !== 'pr') {
+        return res.status(400).json({ error: "Visibility must be 'pu' or 'pr'." });
+    }
+
+    const postData = { idUser, postText, vis };
 
     PostModel.createPost(postData, (err, post) => {
         if (err) {
@@ -70,18 +168,19 @@ const createPost = (req, res) => {
 
 const updatePost = (req, res) => {
     const id = req.params.id;
-    const postText = req.body.postText;
     const loggedInUserId = req.user.id;
-
-    /*if (id === undefined) {
-        return res.status(400).send();
-    }
-    if (!req.body.postText) {
-        return res.status(400).send();
-    }*/
+    const {postText, visibility} = req.body;
 
     if (!postText) {
         return res.status(400).json({ error: "The text of the post is required." });
+    }
+
+    let vis = visibility;
+
+    if (vis !== undefined && vis !== null) {
+        if (vis !== 'pu' && vis !== 'pr') {
+            return res.status(400).json({ error: "Visibility must be 'pu' or 'pr'." });
+        }
     }
 
     PostModel.getPostById(id, (err, post) => {
@@ -96,7 +195,11 @@ const updatePost = (req, res) => {
             return res.status(403).json({ error: "You do not have permission to update this post." });
         }
 
-        PostModel.updatePost(id, postText, (err, result) => {
+        if (vis === undefined || vis === null) {
+            vis = post[0].visibility;
+        }
+
+        PostModel.updatePost(id, postText, vis, (err, result) => {
             if (err) {
                 return res.status(500).json({ error: "Error updating post in database." });
             }

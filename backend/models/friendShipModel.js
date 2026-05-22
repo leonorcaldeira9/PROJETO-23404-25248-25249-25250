@@ -9,15 +9,7 @@ const FriendshipModel = {
 
     getFriendsByUser: (userId, callback) => {
         const sql = `
-        SELECT 
-            CASE 
-                WHEN F.userId = ? THEN U2.fullName 
-                ELSE U1.fullName 
-            END AS Friends
-        FROM friendship AS F
-        JOIN users AS U1 ON F.userId = U1.id
-        JOIN users AS U2 ON F.friendId = U2.id
-        WHERE (F.userId = ? OR F.friendId = ?) AND F.friendshipStatus = 'F'
+            SELECT U.fullName FROM friendship AS F JOIN users AS U ON U.id = F.friendId WHERE F.userId = ? AND F.friendshipStatus = 'F'
         `;
         db.query(sql, [userId, userId, userId], callback);
     },
@@ -30,21 +22,61 @@ const FriendshipModel = {
 
 
     updateFriendshipStatus: (userId, friendId, status, callback) => {
-        let sql;
 
-        if (status === 'F') {
-            sql = 'UPDATE friendship SET friendshipStatus=?, friendDate=CURRENT_TIMESTAMP WHERE userId=? AND friendId=?';
-        } else {
-            sql = 'UPDATE friendship SET friendshipStatus=? WHERE userId=? AND friendId=?';
-        }
-        db.query(sql, [status, userId, friendId], callback);
+
+        const sqlUpdate = 'UPDATE friendship SET friendshipStatus=?, friendDate=CURRENT_TIMESTAMP WHERE userId=? AND friendId=?';
+
+        db.query(sqlUpdate, [status, friendId, userId], (err, result) => {
+            if (err) return callback(err, null);
+
+            if (result.affectedRows === 0) return callback(null, result);
+
+            if (status === 'F') {
+
+                const sqlInsertReverse = `
+                    INSERT INTO friendship (userId, friendId, friendshipStatus, friendDate) 
+                    VALUES (?, ?, ?, CURRENT_TIMESTAMP) 
+                    ON DUPLICATE KEY UPDATE friendshipStatus=?, friendDate=CURRENT_TIMESTAMP
+                `;
+
+                db.query(sqlInsertReverse, [userId, friendId, status, status], (errReverse, resultReverse) => {
+                    if (errReverse) return callback(errReverse, null);
+
+
+                    return callback(null, result);
+                });
+            } else {
+
+                return callback(null, result);
+            }
+        });
     },
 
 
-    deleteFriendship: (userId, friendId, callback) => {
-        const sql = 'DELETE FROM friendship WHERE userId=? AND friendId=?';
-        db.query(sql, [userId, friendId], callback);
-    }
+    deleteFriendship: (user1, user2, callback) => {
+        const sql = 'DELETE FROM friendship WHERE (userId=? AND friendId=?) OR (userId=? AND friendId=?)';
+        db.query(sql, [user1, user2, user2, user1], callback);
+    },
+
+    checkIfFriends: (user1, user2, callback) => {
+        if (parseInt(user1) == parseInt(user2)) {
+            return callback(null, true);
+        }
+
+        const sql = "SELECT * FROM friendship WHERE userId=? AND friendId=? AND friendshipStatus='F'";
+
+        db.query(sql, [user1, user2], (err, result) => {
+            if (err){
+                return callback(err, null);
+            }
+
+            if (result.length === 0) {
+                return callback(null, false);
+            } else {
+                return callback(null, true);
+            }
+        });
+    },
 };
 
 module.exports = FriendshipModel;
