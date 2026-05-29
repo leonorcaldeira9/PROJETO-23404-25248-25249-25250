@@ -1,135 +1,124 @@
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './login.css';
-//import axios from 'axios';
+import loginImage from '../../assets/loginImage.png';
+import logo from '../../assets/logo.png'
+//import AlertModal from "../../components/alertModal.jsx";
+import {useState} from "react";
+import axios from "axios";
 
 const Login = () => {
 
+    const navigate = useNavigate();
+
+    const [formLoginData, setformLoginData] = useState({
+        email: '',
+        loginPassword: ''
+    });
+
+    /*const [modal, setModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: ''
+    });*/
+
+    const handleChange = (e) => {
+        setformLoginData({
+            ...formLoginData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post('http://localhost:3001/users/login', formLoginData);
+
+            const token = response.data.token;
+            const userName = response.data.name;
+
+            localStorage.setItem('token', token);
+            localStorage.setItem('userName', userName);
+            localStorage.setItem('userId', response.data.id);
+
+            navigate('/feed');
+        } catch (error) {
+            alert(error.response?.data?.error || "Error signing up.");
+        }
+    };
+
     return (
-        <div className="login d-flex justify-content-center align-items-center p-5">
-            <div className="card shadow-lg p-sm-5 border-0 card-style h-auto" >
+        <div className="login d-flex justify-content-center align-items-center p-5 position-relative min-vh-100">
 
-                <h2 className="text-center">Login in Feicebuque</h2>
+            <div className="position-absolute top-0 start-0 m-4">
+                <Link to={"/login"}>
+                    <img
+                        src={logo}
+                        className="logo img-fluid"
+                        alt="Logo do Feicebuque"
+                    />
+                </Link>
+            </div>
 
-                <form>
-                    <div className="mb-2">
-                        <label className="form-label fw-bold text-dark">Full Name</label>
-                        <input
-                            type="text"
-                            className="form-control form-control-lg bg-light border-0"
-                            placeholder="John Doe"
-                            required
-                            style={{fontSize: '1rem'}}
+            <div className="card shadow-lg p-sm-5 border-0 card-style h-auto">
+
+                <div className="row g-0">
+                    <div className="col-md-6 d-none d-md-block">
+                        <img
+                            src={loginImage}
+                            className="img-fluid h-100 w-100 login-image object-fit-cover"
+                            alt="Capa do Feicebuque"
                         />
                     </div>
 
-                    <div className="row">
-                        <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark">Email</label>
-                            <input
-                                type="email"
-                                className="form-control form-control-lg bg-light border-0"
-                                placeholder="username@gmail.com"
-                                required
-                                style={{fontSize: '1rem'}}
-                            />
-                        </div>
+                    <div className="col-md-6">
+                        <div className="card-body p-sm-5 d-flex flex-column justify-content-center h-100">
 
-                        <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark">Password</label>
-                            <input
-                                type="password"
-                                className="form-control form-control-lg bg-light border-0"
-                                placeholder="***********"
-                                required
-                                style={{fontSize: '1rem'}}
-                            />
-                        </div>
-                    </div>
+                            <h2 className="text-center loginText mb-2">Login in Feicebuque</h2>
 
-                    <div className="row">
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-4 mt-5">
+                                    <label className="form-label fw-bold text-dark">Email</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formLoginData.email}
+                                        onChange={handleChange}
+                                        className="form-control form-control-lg bg-light border-0"
+                                        placeholder="username@gmail.com"
+                                        required
+                                        style={{fontSize: '1rem'}}
+                                    />
+                                </div>
 
-                        <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark d-block mb-2">Gender</label>
+                                <div className="mb-5">
+                                    <label className="form-label fw-bold text-dark">Password</label>
+                                    <input
+                                        type="password"
+                                        name="loginPassword"
+                                        value={formLoginData.loginPassword}
+                                        onChange={handleChange}
+                                        className="form-control form-control-lg bg-light border-0"
+                                        placeholder="***********"
+                                        required
+                                        style={{fontSize: '1rem'}}
+                                    />
+                                </div>
 
-                            <div className="form-check form-check-inline">
-                                <input className="form-check-input" type="radio" name="gender" id="genderFemale" value="F"/>
-                                <label className="form-check-label" htmlFor="genderFemale">
-                                    Female
-                                </label>
-                            </div>
+                                <button type="submit" className="btn btn-primary w-50 mb-4 d-block mx-auto">
+                                    Sign in
+                                </button>
 
-                            <div className="form-check form-check-inline">
-                                <input className="form-check-input" type="radio" name="gender" id="genderMale" value="M"/>
-                                <label className="form-check-label" htmlFor="genderMale">
-                                    Male
-                                </label>
-                            </div>
-
-                            <div className="form-check form-check-inline">
-                                <input className="form-check-input" type="radio" name="gender" id="genderOther" value="O"/>
-                                <label className="form-check-label" htmlFor="genderOther">
-                                    Other
-                                </label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark">Birthdate</label>
-                            <input
-                                type="date"
-                                className="form-control form-control-lg bg-light border-0"
-                                required
-                                style={{fontSize: '1rem'}}
-                            />
+                                <p className="text-center fs-6">Do you not have an account?
+                                    <Link to="/register">
+                                        <button type="button" className="btn btn-link fs-6">Register here</button>
+                                    </Link>
+                                </p>
+                            </form>
                         </div>
                     </div>
-
-                    <div className="row">
-                        <div className="col-sm mb-2">
-                            <label className="form-label fw-bold text-dark">Country</label>
-                            <input
-                                type="text"
-                                className="form-control form-control-lg bg-light border-0"
-                                placeholder="Portugal"
-                                required
-                                style={{fontSize: '1rem'}}
-                            />
-                        </div>
-
-                        <div className="col-sm mb-2">
-                            <label className="form-label fw-bold text-dark">City</label>
-                            <input
-                                type="text"
-                                className="form-control form-control-lg bg-light border-0"
-                                placeholder="Lisboa"
-                                required
-                                style={{fontSize: '1rem'}}
-                            />
-                        </div>
-
-                        <div className="col-sm mb-5">
-                            <label className="form-label fw-bold text-dark">Phone Number</label>
-                            <input
-                                type="tel"
-                                className="form-control form-control-lg bg-light border-0"
-                                placeholder="9xxxxxxxx"
-                                pattern="9[0-9]{8}"
-                                required
-                                style={{fontSize: '1rem'}}
-                            />
-                        </div>
-                    </div>
-
-                    <button type="submit" className="btn btn-primary w-50 mb-2 d-block mx-auto">
-                        Create Account
-                    </button>
-
-                    <p className="text-center fs-6">Do you have an account?
-                        <Link to="/login">
-                            <button className="btn btn-link fs-6">Login</button>
-                        </Link>
-                    </p>
-                </form>
+                </div>
             </div>
         </div>
     );
