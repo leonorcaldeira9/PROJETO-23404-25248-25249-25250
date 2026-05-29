@@ -82,7 +82,9 @@ const loginUser = (req, res) => {
                 
                 return res.json({
                     message: "Login successfull!",
-                    token: token 
+                    token: token,
+                    name: results[0].fullName,
+                    id: user.id
                 });
             } else {
                 return res.status(401).json({ error: "Incorrect password." });

@@ -2,7 +2,7 @@ const db = require('../db_connection/db');
 
 const PostLikeModel = {
     getLikesByPost: (idPost, callback) => {
-        const sql = 'SELECT count(*) FROM posts_likes WHERE idPost=?';
+        const sql = 'SELECT count(*) AS likes FROM posts_likes WHERE idPost=?';
         db.query(sql, [idPost], callback);
     },
 
