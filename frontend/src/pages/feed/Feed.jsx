@@ -3,9 +3,12 @@ import axios from 'axios';
 import './feed.css';
 import {useCallback, useEffect, useState} from "react";
 //import AlertModal from "../../components/alertModal.jsx";
-import Navbar from "../../components/navBar.jsx";
+import Navbar from "../../components/navBar/navBar.jsx";
+import ListFriends from "../../components/listFriends/listFriends.jsx";
+import ListOptions from "../../components/listOptions/listOptions.jsx";
+import PostCard from "../../components/postCard/postCard.jsx";
 
-const formatData = (dataString) => {
+/*const formatData = (dataString) => {
     if (!dataString) return '';
 
     const data = new Date(dataString);
@@ -102,10 +105,9 @@ const PostCard = ({ post, token, formatData}) => {
 
             </div>
         </div>
-
     );
 };
-
+*/
 const Feed = () => {
 
     const [posts, setPosts] = useState([]);
@@ -169,11 +171,17 @@ const Feed = () => {
 
 
         <div className="feed">
-            <Navbar />
+            <Navbar/>
 
             <div className="container mt-4">
-                <div className="row">
-                    <div className="col-md-6">
+
+                <div className="row gx-5">
+
+                    <div className="col-md-3">
+                        <ListOptions></ListOptions>
+                    </div>
+
+                    <div className="col-md-6 justify-content-center">
 
                         <div className="card shadow-sm border-0 mb-4 p-3">
                             <textarea
@@ -184,7 +192,10 @@ const Feed = () => {
                                 onChange={(e) => setNewPostText(e.target.value)}
                             ></textarea>
                             <div className="text-end">
-                                <button className="btn btn-primary px-4 rounded-pill" onClick={handleCreatePost}>Post</button>
+                                <button className="btn btn-primary px-4" onClick={handleCreatePost}>
+                                    <i className="bi bi-send-plus-fill me-2"></i>
+                                    Post
+                                </button>
                             </div>
                         </div>
 
@@ -192,18 +203,16 @@ const Feed = () => {
                             <p className="text-center text-muted">There are no posts in your feed yet.</p>
                         ) : (
                             posts.map((post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    token={token}
-                                    formatData={formatData}
-                                />
+                                <PostCard key={post.id} post={post} token={token} />
                             ))
                         )}
                     </div>
+
+                    <div className="col-md-3">
+                        <ListFriends></ListFriends>
+                    </div>
                 </div>
             </div>
-
         </div>
     );
 

@@ -71,7 +71,7 @@ const FriendsListWidget = () => {
     }
 
     return (
-        <div className="card shadow-sm border-0 p-3 friends-card">
+        <div className="card shadow-sm border-0 p-3">
             <h6 className="fw-bold mb-3">
                 <i className="bi bi-people-fill me-2 text-primary"></i>
                 Friends ({friends.length})
@@ -82,7 +82,7 @@ const FriendsListWidget = () => {
                     <p className="text-muted small text-center my-2">No friends found.</p>
                 ) : (
                     friends.map((friend) => (
-                        <div key={friend.friendId} className="d-flex align-items-center justify-content-between">
+                        <div key={friend.id} className="d-flex align-items-center justify-content-between">
                             <Link to={`/profile/${friend.id}`} className="d-flex align-items-center gap-2 text-decoration-none text-dark" style={{ cursor: 'pointer' }}>
 
                                 <FriendAvatar friend={friend} />

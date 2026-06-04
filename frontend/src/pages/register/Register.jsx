@@ -3,7 +3,7 @@ import axios from 'axios';
 import './register.css';
 import {useState} from "react";
 import logo from "../../assets/logo.png";
-import AlertModal from "../../components/alertModal.jsx";
+import AlertModal from "../../components/alertModal/alertModal.jsx";
 
 const Register = () => {
 

@@ -3,11 +3,11 @@
 }
 
 .friendName{
-    maxWidth: 140px;
+    max-width: 140px;
 }
 
 .friendCity{
-    fontSize: 11px;
+    font-size: 11px;
 }
 
 .friendOnline{
