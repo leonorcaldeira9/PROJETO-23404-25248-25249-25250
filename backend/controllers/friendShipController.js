@@ -85,18 +85,19 @@ const updateFriendshipStatus = (req, res) => {
     /*const { userId, friendId, friendshipStatus } = req.body;
     if (!userId || !friendId || !friendshipStatus) return res.status(400).send("Este erro ao update status");*/
 
-    const userId = req.user.id;
+    //const userId = req.user.id;
+    const userWithRequestId = req.user.id;
     const { friendId, friendshipStatus } = req.body;
 
     if (!friendId || !friendshipStatus) {
         return res.status(400).json({ error: "The friend's ID and friendship status are required." });
     }
 
-    if (userId === parseInt(friendId)) {
+    if (userWithRequestId === parseInt(friendId)) {
         return res.status(400).json({ error: "You cannot change the state of your friendship with yourself." });
     }
 
-    FriendshipModel.updateFriendshipStatus(userId, friendId, friendshipStatus, (err, result) => {
+    FriendshipModel.updateFriendshipStatus(friendId, userWithRequestId, friendshipStatus, (err, result) => {
         if (err) {
             return res.status(500).json({ error: "Error updating friendship status." });
         }

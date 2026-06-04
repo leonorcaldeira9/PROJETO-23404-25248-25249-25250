@@ -1,7 +1,7 @@
 import {Link, useNavigate} from 'react-router-dom';
 import './navBar.css';
 import {useState} from "react";
-import logo from "../assets/logo.png";
+import logo from "../../assets/logo.png";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Navbar = () => {
@@ -21,7 +21,7 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    const photoUrl = `/users/${userId}.jpeg`;
+    const photoUrl = `/users/${userId}.png`;
 
     return (
         <nav className="navbar sticky-top navbar-light bg-light shadow-sm">

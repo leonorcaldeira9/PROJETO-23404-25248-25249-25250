@@ -117,9 +117,9 @@ const getPostsByUser = (req, res) => {
         checkIfFriends(idLoggedInUser, idTargetUser, (err, areFriends) => {
             if (err) return res.status(500).json({ error: "Error checking friendship." });
 
-            if (targetUser.privacy === 'pr' && !areFriends && !isSameUser) {
+            /*if (targetUser.privacy === 'pr' && !areFriends && !isSameUser) {
                 return res.status(403).json({ error: "This account is private. Only friends can see posts." });
-            }
+            }*/
 
             PostModel.getPostsByUser(idTargetUser, (err, posts) => {
                 if (err) {
@@ -134,6 +134,11 @@ const getPostsByUser = (req, res) => {
                     return res.status(200).json(posts);
                 } else {
                     const publicPosts = posts.filter(post => post.visibility === 'pu');
+
+                    if (targetUser.privacy === 'pr' && publicPosts.length === 0) {
+                        return res.status(403).json({ error: "This account is private. Only friends can see posts." });
+                    }
+
                     return res.status(200).json(publicPosts);
                 }
             });

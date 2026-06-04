@@ -9,9 +9,9 @@ const FriendshipModel = {
 
     getFriendsByUser: (userId, callback) => {
         const sql = `
-            SELECT U.fullName FROM friendship AS F JOIN users AS U ON U.id = F.friendId WHERE F.userId = ? AND F.friendshipStatus = 'F'
+            SELECT U.id, U.fullName, U.city FROM friendship AS F JOIN users AS U ON U.id = F.friendId WHERE F.userId = ? AND F.friendshipStatus = 'F'
         `;
-        db.query(sql, [userId, userId, userId], callback);
+        db.query(sql, [userId], callback);
     },
 
 

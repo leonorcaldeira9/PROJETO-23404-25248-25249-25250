@@ -14,7 +14,11 @@ const verifyPostAccess = (idPost, idLoggedInUser, res, onSuccessCallback) => {
             return onSuccessCallback(targetPost);
         }
 
-        UserModel.getUserById(targetPost.idUser, (err, userArray) => {
+        if (targetPost.visibility === "pu") {
+            return onSuccessCallback(targetPost);
+        }
+
+        /*UserModel.getUserById(targetPost.idUser, (err, userArray) => {
             if (err) return res.status(500).json({ error: "Error checking user profile." });
 
             const authorProfile = userArray[0];
@@ -33,6 +37,16 @@ const verifyPostAccess = (idPost, idLoggedInUser, res, onSuccessCallback) => {
             } else {
                 return onSuccessCallback(targetPost);
             }
+        });*/
+
+        FriendshipModel.checkIfFriends(idLoggedInUser, targetPost.idUser, (err, areFriends) => {
+            if (err) return res.status(500).json({ error: "Error checking permissions." });
+
+            if (!areFriends) {
+                return res.status(403).json({ error: "Access denied. This account or post is private." });
+            }
+
+            return onSuccessCallback(targetPost);
         });
     });
 };
