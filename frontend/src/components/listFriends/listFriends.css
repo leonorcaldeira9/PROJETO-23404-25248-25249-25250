@@ -1,5 +1,8 @@
 .friendsCard{
-    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 100px);
+    position: sticky;
+    overflow-y: auto;
+    top: 160px;
 }
 
 .friendName{

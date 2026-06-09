@@ -16,7 +16,7 @@ const OptionsListWidget = () => {
     ];
 
     return (
-        <div className="card shadow-sm border-0 p-3">
+        <div className="card shadow-sm border-0 p-3 optionCard">
             <h6 className="fw-bold mb-3">
                 Options
             </h6>

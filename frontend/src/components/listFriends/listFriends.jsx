@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import {Link} from "react-router-dom";
 import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import './listFriends.css';
 
 const FriendAvatar = ({ friend }) => {
     const [hasError, setHasError] = useState(false);
@@ -71,7 +72,7 @@ const FriendsListWidget = () => {
     }
 
     return (
-        <div className="card shadow-sm border-0 p-3">
+        <div className="card shadow-sm border-0 p-3 friendsCard">
             <h6 className="fw-bold mb-3">
                 <i className="bi bi-people-fill me-2 text-primary"></i>
                 Friends ({friends.length})

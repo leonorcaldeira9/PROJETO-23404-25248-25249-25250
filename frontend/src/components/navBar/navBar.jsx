@@ -3,6 +3,7 @@ import './navBar.css';
 import {useState} from "react";
 import logo from "../../assets/logo.png";
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import SettingsMenu from "../SettingsMenu/Settings.jsx";
 
 const Navbar = () => {
 
@@ -48,10 +49,12 @@ const Navbar = () => {
                         <i className="bi bi-bell fs-3 text-secondary"></i>
                     </button>
 
-                    <button
-                        className="btn btn-light border-0 rounded-circle  d-flex align-items-center justify-content-center nav-icons">
-                        <i className="bi bi-gear fs-3 text-secondary"></i>
-                    </button>
+                    {/*<button*/}
+                    {/*    className="btn btn-light border-0 rounded-circle  d-flex align-items-center justify-content-center nav-icons">*/}
+
+                    {/*    <i className="bi bi-gear fs-3 text-secondary"></i>*/}
+                    {/*</button>*/}
+                    <SettingsMenu onLogout={handleLogout} />
 
                     <button onClick={handleLogout}
                         className="btn btn-light border-0 rounded-circle  d-flex align-items-center justify-content-center nav-icons">

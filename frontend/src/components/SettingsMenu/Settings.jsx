@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+
 
 const SettingsMenu = ({ onLogout }) => {
     // State to control the visibility of the settings dropdown
@@ -41,7 +42,7 @@ const SettingsMenu = ({ onLogout }) => {
         const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
 
         if (confirmDelete) {
-            // TODO: API call to delete the user from database
+
             console.log("Account deleted locally for testing.");
             onLogout(); // Triggers the logout function passed from Navbar
         }
@@ -58,9 +59,16 @@ const SettingsMenu = ({ onLogout }) => {
             {/* Dropdown Menu */}
             {isOpen && (
                 <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm" style={{ minWidth: '200px' }}>
-                    <button className="dropdown-item d-flex align-items-center" onClick={handleEditProfile}>
+                    {/*<button className="dropdown-item d-flex align-items-center" onClick={handleEditProfile}>*/}
+                    {/*    <i className="bi bi-pencil-square me-2 text-secondary"></i> Edit Profile*/}
+                    {/*</button>*/}
+                    <Link
+                        to="/EditProfile"
+                        className="dropdown-item d-flex align-items-center text-decoration-none"
+                        onClick={() => setIsOpen(false)}
+                    >
                         <i className="bi bi-pencil-square me-2 text-secondary"></i> Edit Profile
-                    </button>
+                    </Link>
 
                     <div className="dropdown-divider"></div>
 

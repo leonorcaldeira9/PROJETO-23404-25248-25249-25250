@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {useCallback, useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
+import "../../components/postCard/postCard.css";
 
 const formatData = (dataString) => {
     if (!dataString) return '';
@@ -58,8 +59,6 @@ const PostCard = ({ post, token, viewComments = false}) => {
             });
             setComments(response.data);
 
-
-
         } catch (error) {
             console.error("Error loading comments:", error);
         }
@@ -109,7 +108,7 @@ const PostCard = ({ post, token, viewComments = false}) => {
 
                 <div className="d-flex align-items-center mb-3">
 
-                    <Link to={`/profile/${authorId}`} className="d-flex align-items-center text-decoration-none text-dark" style={{ cursor: 'pointer' }}>
+                    <Link to={`/profile/${authorId}`} className="d-flex align-items-center text-decoration-none text-dark cursor-pointer" >
 
                         <div className="me-2 d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light user-profile-picture">
                             {(!authorId || imageError) ? (
@@ -118,8 +117,6 @@ const PostCard = ({ post, token, viewComments = false}) => {
                                 <img
                                     src={photoUrl}
                                     alt={`Photo of ${post.fullName}`}
-                                    className="w-100 h-100"
-                                    style={{ objectFit: 'cover' }}
                                     onError={() => setImageError(true)}
                                 />
                             )}
@@ -143,8 +140,14 @@ const PostCard = ({ post, token, viewComments = false}) => {
                 <div className="d-flex justify-content-between">
                     <div className="d-flex gap-2">
                         <button
-                            className={`btn btn-sm fw-semibold ${hasLiked ? 'text-primary' : 'text-secondary btn-light'}`}
-                            style={hasLiked ? { backgroundColor: '#e7f0fd' } : {}}
+                            // className={`btn btn-sm fw-semibold ${hasLiked ? 'text-primary' : 'text-secondary btn-light'}`}
+                            // style={hasLiked ? { backgroundColor: '#e7f0fd' } : {}}
+                            // onClick={handleLike}
+                            className={`btn btn-sm fw-semibold ${
+                                hasLiked
+                                    ? 'text-primary btn-liked' 
+                                    : 'text-secondary btn-light' 
+                            }`}
                             onClick={handleLike}
                         >
                             <i className={`me-1 ${hasLiked ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'}`}></i>
@@ -163,14 +166,6 @@ const PostCard = ({ post, token, viewComments = false}) => {
                         )}
                     </div>
                     <small className="text-muted mt-1">{post.visibility === 'pr' ? 'Private' : 'Public'}</small>
-                </div>
-
-
-                <div className="mt-3 d-flex gap-2 align-content-center">
-                    <input type="text" className="form-control form-control-sm rounded-pill bg-light" placeholder="Write a comment..." />
-                    <button className="btn btn-primary btn-sm px-4">
-                        <i className="bi bi-send-plus-fill"></i>
-                    </button>
                 </div>
 
             </div>

@@ -5,3 +5,10 @@
 .rowGap {
     row-gap: 20px;
 }
+
+.optionCard {
+    max-height: calc(100vh - 100px);
+    position: sticky;
+    overflow-y: auto;
+    top: 160px;
+}

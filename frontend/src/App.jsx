@@ -4,6 +4,8 @@ import Login from "./pages/login/Login.jsx";
 import Feed from "./pages/feed/Feed.jsx";
 import Profile from "./pages/profile/Profile.jsx";
 import PostPage from "./pages/post/PostPage.jsx";
+import Settings from "./components/SettingsMenu/Settings.jsx";
+import EditProfile from "./pages/EditProfile/EditProfile.jsx";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/post/:id" element={<PostPage />} />
+            <Route path="/EditProfile" element={<EditProfile />} />
+            {/*<Route path="/settings" element={<Settings />} />*/}
         </Routes>
       </BrowserRouter>
   )
