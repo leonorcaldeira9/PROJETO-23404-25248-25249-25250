@@ -19,6 +19,184 @@ const formatData = (dataString) => {
     return `${day}/${month}/${year} at ${hours}:${minutes}`;
 };
 
+const CommentItem = ({
+                         comment,
+                         allComments,
+                         isReply = false,
+                         postDate,
+                         currentUserId,
+                         replyingTo,
+                         setReplyingTo,
+                         handleReplyClick,
+                         handleDeleteComment,
+                         editingCommentId,
+                         setEditingCommentId,
+                         editCommentText,
+                         setEditCommentText,
+                         handleUpdateComment,
+                         newComment,
+                         setNewComment,
+                         handleCreateComment
+                     }) => {
+    const replies = allComments.filter(c => c.parentCommentId === comment.id);
+
+    return (
+        <div key={comment.id} className={`comment-thread pb-3 pt-1 ${isReply ? 'comment-reply-item' : ''}`}>
+            <div className="d-flex gap-3 position-relative z-1 bg-white pb-1">
+                <div className="d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light user-profile-picture flex-shrink-0">
+
+                    <img
+                        src={`/users/${comment.idUser}.png`}
+                        alt="User"
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.style.display = 'none';
+                            e.target.nextElementSibling.style.display = 'block';
+                        }}
+                    />
+                    <i className="bi bi-person-circle text-secondary user-profile-picture-default" style={{display: 'none'}}></i>
+                </div>
+
+                <div className="w-100">
+                    <div className="d-flex align-items-center gap-2">
+                        <span className="fw-bold fs-6">{comment.fullName}</span>
+                        <span className="text-muted small">{formatData(postDate)}</span>
+                    </div>
+
+                    {editingCommentId === comment.id ? (
+                        <div className="d-flex align-items-center gap-2 mb-2 mt-1 position-relative">
+                            <input
+                                type="text"
+                                className="form-control form-control-sm rounded-pill bg-white border-secondary-subtle"
+                                value={editCommentText}
+                                onChange={(e) => setEditCommentText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleUpdateComment(comment.id);
+                                    if (e.key === 'Escape') setEditingCommentId(null);
+                                }}
+                                autoFocus
+                            />
+                            <button
+                                className="btn btn-sm btn-primary rounded-pill px-3"
+                                onClick={() => handleUpdateComment(comment.id)}
+                            >
+                                Save
+                            </button>
+                            <button
+                                className="btn btn-sm btn-light border rounded-pill px-3"
+                                onClick={() => setEditingCommentId(null)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    ) : (
+                        <p className="mb-1 text-dark text-break">{comment.commentText}</p>
+                    )}
+
+                    <div className="d-flex gap-3 text-muted small fw-semibold">
+                        <span style={{cursor: 'pointer'}}><i className="bi bi-hand-thumbs-up me-1"></i>0</span>
+
+                        <span
+                            className="text-primary"
+                            style={{cursor: 'pointer'}}
+                            onClick={() => handleReplyClick(comment)}
+                        >
+                            Reply
+                        </span>
+
+                        {comment.idUser === Number(currentUserId) && (
+
+                            <>
+                                <span
+                                    className="text-secondary"
+                                    style={{cursor: 'pointer'}}
+                                    onClick={() => {
+                                        setEditingCommentId(comment.id);
+                                        setEditCommentText(comment.commentText);
+                                        setReplyingTo(null);
+                                    }}
+                                    title="Edit comment"
+                                >
+                                    Edit
+                                </span>
+
+                                <span
+                                    className="text-danger"
+                                    style={{cursor: 'pointer'}}
+                                    onClick={() => handleDeleteComment(comment.id)}
+                                    title="Delete comment"
+                                >
+                                    Delete
+                                </span>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {replyingTo && replyingTo.id === comment.id && (
+                <div className="d-flex gap-3 align-items-center mt-2 mb-3 ms-5 ps-2">
+                    <div className="d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light flex-shrink-0" style={{width: '32px', height: '32px'}}>
+                        <img
+                            src={`/users/${currentUserId}.png`}
+                            alt="You"
+                            style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                            onError={(e) => e.target.style.display = 'none'}
+                        />
+                    </div>
+                    <div className="w-100 position-relative">
+                        <input
+                            type="text"
+                            className="form-control form-control-sm rounded-pill bg-white border-secondary-subtle pe-5"
+                            placeholder="Add a reply..."
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleCreateComment();
+                            }}
+                            autoFocus
+                        />
+                        <button
+                            className="btn btn-sm position-absolute top-50 end-0 translate-middle-y"
+                            onClick={() => setReplyingTo(null)}
+                            title="Cancel"
+                        >
+                            <i className="bi bi-x-circle-fill text-muted"></i>
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {replies.length > 0 && (
+                <div className="comment-replies mt-3">
+                    {replies.map(reply =>
+                        <CommentItem
+                            key={reply.id}
+                            comment={reply}
+                            allComments={allComments}
+                            isReply={true}
+                            postDate={postDate}
+                            currentUserId={currentUserId}
+                            replyingTo={replyingTo}
+                            setReplyingTo={setReplyingTo}
+                            handleReplyClick={handleReplyClick}
+                            handleDeleteComment={handleDeleteComment}
+                            editingCommentId={editingCommentId}
+                            setEditingCommentId={setEditingCommentId}
+                            editCommentText={editCommentText}
+                            setEditCommentText={setEditCommentText}
+                            handleUpdateComment={handleUpdateComment}
+                            newComment={newComment}
+                            setNewComment={setNewComment}
+                            handleCreateComment={handleCreateComment}
+                        />
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const PostPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -130,144 +308,7 @@ const PostPage = () => {
 
     if (isLoading) return <div className="text-center mt-5 text-muted">Loading...</div>;
 
-    const CommentItem = (comment, allComments, isReply = false) => {
-        const replies = allComments.filter(c => c.parentCommentId === comment.id);
 
-        return (
-            <div key={comment.id} className={`comment-thread pb-3 pt-1 ${isReply ? 'comment-reply-item' : ''}`}>
-                <div className="d-flex gap-3 position-relative z-1 bg-white pb-1">
-                    <div className="d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light user-profile-picture flex-shrink-0">
-
-                        <img
-                            src={`/users/${comment.idUser}.png`}
-                            alt="User"
-                            onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.style.display = 'none';
-                                e.target.nextElementSibling.style.display = 'block';
-                            }}
-                        />
-                        <i className="bi bi-person-circle text-secondary user-profile-picture-default" style={{display: 'none'}}></i>
-                    </div>
-
-                    <div className="w-100">
-                        <div className="d-flex align-items-center gap-2">
-                            <span className="fw-bold fs-6">{comment.fullName}</span>
-                            <span className="text-muted small">{formatData(post.postDate)}</span>
-                        </div>
-
-                        {editingCommentId === comment.id ? (
-                            <div className="d-flex align-items-center gap-2 mb-2 mt-1 position-relative">
-                                <input
-                                    type="text"
-                                    className="form-control form-control-sm rounded-pill bg-white border-secondary-subtle"
-                                    value={editCommentText}
-                                    onChange={(e) => setEditCommentText(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') handleUpdateComment(comment.id);
-                                        if (e.key === 'Escape') setEditingCommentId(null);
-                                    }}
-                                    autoFocus
-                                />
-                                <button
-                                    className="btn btn-sm btn-primary rounded-pill px-3"
-                                    onClick={() => handleUpdateComment(comment.id)}
-                                >
-                                    Save
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-light border rounded-pill px-3"
-                                    onClick={() => setEditingCommentId(null)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        ) : (
-                            <p className="mb-1 text-dark text-break">{comment.commentText}</p>
-                        )}
-
-                        <div className="d-flex gap-3 text-muted small fw-semibold">
-                            <span style={{cursor: 'pointer'}}><i className="bi bi-hand-thumbs-up me-1"></i>0</span>
-
-                            <span
-                                className="text-primary"
-                                style={{cursor: 'pointer'}}
-                                onClick={() => handleReplyClick(comment)}
-                            >
-                            Reply
-                        </span>
-
-                        {comment.idUser === Number(currentUserId) && (
-
-                            <>
-                                <span
-                                    className="text-secondary"
-                                    style={{cursor: 'pointer'}}
-                                    onClick={() => {
-                                        setEditingCommentId(comment.id);
-                                        setEditCommentText(comment.commentText);
-                                        setReplyingTo(null);
-                                    }}
-                                    title="Edit comment"
-                                >
-                                    Edit
-                                </span>
-
-                                <span
-                                    className="text-danger"
-                                    style={{cursor: 'pointer'}}
-                                    onClick={() => handleDeleteComment(comment.id)}
-                                    title="Delete comment"
-                                >
-                                    Delete
-                                </span>
-                            </>
-                        )}
-                        </div>
-                    </div>
-                </div>
-
-                {replyingTo && replyingTo.id === comment.id && (
-                    <div className="d-flex gap-3 align-items-center mt-2 mb-3 ms-5 ps-2">
-                        <div className="d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light flex-shrink-0" style={{width: '32px', height: '32px'}}>
-                            <img
-                                src={`/users/${currentUserId}.png`}
-                                alt="You"
-                                style={{width: '100%', height: '100%', objectFit: 'cover'}}
-                                onError={(e) => e.target.style.display = 'none'}
-                            />
-                        </div>
-                        <div className="w-100 position-relative">
-                            <input
-                                type="text"
-                                className="form-control form-control-sm rounded-pill bg-white border-secondary-subtle pe-5"
-                                placeholder="Add a reply..."
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleCreateComment();
-                                }}
-                                autoFocus
-                            />
-                            <button
-                                className="btn btn-sm position-absolute top-50 end-0 translate-middle-y"
-                                onClick={() => setReplyingTo(null)}
-                                title="Cancel"
-                            >
-                                <i className="bi bi-x-circle-fill text-muted"></i>
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {replies.length > 0 && (
-                    <div className="comment-replies mt-3">
-                        {replies.map(reply => CommentItem(reply, allComments, true))}
-                    </div>
-                )}
-            </div>
-        );
-    };
 
     return (
         <div className="feed background min-vh-100">
@@ -320,7 +361,30 @@ const PostPage = () => {
                                 {topLevelComments.length === 0 ? (
                                     <p className="text-muted text-center">No comments yet. Be the first!</p>
                                 ) : (
-                                    topLevelComments.map(comment => CommentItem(comment, comments, false))
+                                    topLevelComments.map(comment =>
+
+                                        <CommentItem
+                                            key={comment.id}
+                                            comment={comment}
+                                            allComments={comments}
+                                            isReply={false}
+                                            postDate={post.postDate}
+                                            currentUserId={currentUserId}
+                                            replyingTo={replyingTo}
+                                            setReplyingTo={setReplyingTo}
+                                            handleReplyClick={handleReplyClick}
+                                            handleDeleteComment={handleDeleteComment}
+                                            editingCommentId={editingCommentId}
+                                            setEditingCommentId={setEditingCommentId}
+                                            editCommentText={editCommentText}
+                                            setEditCommentText={setEditCommentText}
+                                            handleUpdateComment={handleUpdateComment}
+                                            newComment={newComment}
+                                            setNewComment={setNewComment}
+                                            handleCreateComment={handleCreateComment}
+                                        />
+
+                                    )
                                 )}
                             </div>
 

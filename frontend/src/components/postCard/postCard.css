@@ -23,3 +23,6 @@
     background-color: #e7f0fd !important;
 }
 
+.dots-button-style {
+    cursor: pointer;
+}

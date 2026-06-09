@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import "../../components/postCard/postCard.css";
 
@@ -21,6 +21,9 @@ const PostCard = ({ post, token, viewComments = false}) => {
     const [hasLiked, setHasLiked] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [comments, setComments] = useState([]);
+
+    const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef(null);
 
     const currentUserId = localStorage.getItem('userId');
     const navigate = useNavigate();
@@ -72,6 +75,28 @@ const PostCard = ({ post, token, viewComments = false}) => {
         //fetchPostImage();
     }, [fetchLikes, fetchComments ]);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const toggleMenu = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const handleEditPost = () => {
+        setIsOpen(false);
+        //('/edit-profile');
+    };
+
     const handleLike = async () => {
         const previousHasLiked = hasLiked;
         const previousLikes = likes;
@@ -98,6 +123,21 @@ const PostCard = ({ post, token, viewComments = false}) => {
         }
     };
 
+    const handleDeletePost = async (postId) => {
+
+        if(!window.confirm("Are you sure you want to delete your post?")) return;
+
+        try {
+            await axios.delete(`http://localhost:3001/posts/delete/${postId}`, {
+                headers: {Authorization: `Bearer ${token}`}
+            });
+            window.location.reload();
+
+        }  catch (error) {
+            console.error("Error deleting comment: ", error);
+        }
+    };
+
     const authorId = post.idUser;
     const photoUrl = `/users/${authorId}.png`;
 
@@ -106,11 +146,13 @@ const PostCard = ({ post, token, viewComments = false}) => {
         <div className="card shadow-sm border-0 mb-4">
             <div className="card-body">
 
-                <div className="d-flex align-items-center mb-3">
+                <div className="d-flex align-items-center justify-content-between mb-3">
 
-                    <Link to={`/profile/${authorId}`} className="d-flex align-items-center text-decoration-none text-dark cursor-pointer" >
+                    <Link to={`/profile/${authorId}`}
+                          className="d-flex align-items-center text-decoration-none text-dark cursor-pointer">
 
-                        <div className="me-2 d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light user-profile-picture">
+                        <div
+                            className="me-2 d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light user-profile-picture">
                             {(!authorId || imageError) ? (
                                 <i className="bi bi-person-circle text-secondary user-profile-picture-default"></i>
                             ) : (
@@ -129,14 +171,50 @@ const PostCard = ({ post, token, viewComments = false}) => {
 
                     </Link>
 
+                    {Number(authorId) === Number(currentUserId) && (
+
+
+                        <div className="dropdown" ref={menuRef}>
+                            <button
+                                onClick={toggleMenu}
+                                className="btn border-0 d-flex align-items-center justify-content-center">
+
+                                <i className="bi bi-three-dots-vertical fs-5 text-muted dots-button-style"></i>
+                            </button>
+
+                            {isOpen && (
+                                <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm" style={{ minWidth: '200px' }}>
+
+                                    <Link
+                                        to="/EditProfile"
+                                        className="dropdown-item d-flex align-items-center text-decoration-none"
+                                        onClick={handleEditPost}
+                                    >
+                                        <i className="bi bi-pencil-square me-2 text-secondary"></i> Edit Post
+                                    </Link>
+
+                                    <div className="dropdown-divider"></div>
+
+                                    <button
+                                        className="dropdown-item d-flex align-items-center text-danger"
+                                        onClick={() => {
+                                            handleDeletePost(post.id);
+                                            setIsOpen(false);
+                                        }}
+                                    >
+                                        <i className="bi bi-trash me-2"></i> Delete
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                 </div>
 
                 <p className="card-text">{post.postText}</p>
 
 
-
-                <hr />
+                <hr/>
                 <div className="d-flex justify-content-between">
                     <div className="d-flex gap-2">
                         <button
