@@ -45,9 +45,12 @@ const Navbar = () => {
 
 
                 <div className="d-flex align-items-center gap-1 position-absolute top-50 end-0 translate-middle-y pe-3">
-                    <button className="btn btn-light border-0 rounded-circle d-flex align-items-center justify-content-center nav-icons">
-                        <i className="bi bi-bell fs-3 text-secondary"></i>
-                    </button>
+
+                    <Link to={"/notifications"}>
+                        <button className="btn btn-light border-0 rounded-circle d-flex align-items-center justify-content-center nav-icons">
+                            <i className="bi bi-bell fs-3 text-secondary"></i>
+                        </button>
+                    </Link>
 
                     {/*<button*/}
                     {/*    className="btn btn-light border-0 rounded-circle  d-flex align-items-center justify-content-center nav-icons">*/}

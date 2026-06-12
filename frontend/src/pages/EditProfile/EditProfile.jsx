@@ -74,22 +74,17 @@ const EditProfile = () => {
         });
     };
 
-    // Handle form submission
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
         setMessage({ text: '', type: '' });
 
-        // Clone the payload so we can manipulate it before sending
         const payload = { ...formData };
 
-        // If the password field is empty, remove it
         if (!payload.loginPassword || payload.loginPassword.trim() === "") {
             delete payload.loginPassword;
         }
-
-        console.log("=== PAYLOAD BEING SENT ===");
-        console.log(payload);
 
         try {
             await axios.put(`http://localhost:3001/users/update/${userId}`,
@@ -124,7 +119,7 @@ const EditProfile = () => {
 
             <div className="container mt-5 mb-5" style={{ maxWidth: '800px' }}>
                 <div className="card shadow-sm border-0 p-4">
-                    <h3 className="fw-bold mb-4 text-dark">Editar Perfil</h3>
+                    <h3 className="fw-bold mb-4 text-dark">Edit Profile</h3>
 
                     {message.text && (
                         <div className={`alert alert-${message.type} small py-2`} role="alert">
@@ -134,7 +129,7 @@ const EditProfile = () => {
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label className="form-label small fw-bold text-secondary">Nome Completo</label>
+                            <label className="form-label small fw-bold text-secondary">Full Name</label>
                             <input
                                 type="text"
                                 name="fullName"
@@ -159,22 +154,21 @@ const EditProfile = () => {
                             </div>
 
                             <div className="col-md-6 mb-3">
-                                <label className="form-label small fw-bold text-secondary">Nova Password</label>
+                                <label className="form-label small fw-bold text-secondary">New Password</label>
                                 <input
                                     type="password"
                                     name="loginPassword"
                                     className="form-control"
                                     value={formData.loginPassword}
                                     onChange={handleChange}
-                                    placeholder="Deixar em branco para manter a atual"
+                                    placeholder="Leave blank to keep the current"
                                 />
                             </div>
                         </div>
 
-                        {/* Updated Row: Gender, Birth Date, and Marital Status */}
                         <div className="row">
                             <div className="col-md-4 mb-3">
-                                <label className="form-label small fw-bold text-secondary d-block mb-2">Género</label>
+                                <label className="form-label small fw-bold text-secondary d-block mb-2">Gender</label>
                                 <div className="form-check form-check-inline">
                                     <input
                                         className="form-check-input"
@@ -214,7 +208,7 @@ const EditProfile = () => {
                             </div>
 
                             <div className="col-md-4 mb-3">
-                                <label className="form-label small fw-bold text-secondary">Data de Nascimento</label>
+                                <label className="form-label small fw-bold text-secondary">Birth Date</label>
                                 <input
                                     type="date"
                                     name="birthDate"
@@ -225,9 +219,8 @@ const EditProfile = () => {
                                 />
                             </div>
 
-                            {/* THE MISSING FIELD HAS ARRIVED */}
                             <div className="col-md-4 mb-3">
-                                <label className="form-label small fw-bold text-secondary">Estado Civil</label>
+                                <label className="form-label small fw-bold text-secondary">Marital Status</label>
                                 <select
                                     name="maritalStatus"
                                     className="form-select"
@@ -235,18 +228,18 @@ const EditProfile = () => {
                                     onChange={handleChange}
                                     required
                                 >
-                                    <option value="" disabled>Seleciona...</option>
-                                    <option value="S">Solteiro(a)</option>
-                                    <option value="M">Casado(a)</option>
-                                    <option value="D">Divorciado(a)</option>
-                                    <option value="W">Viúvo(a)</option>
+                                    <option value="" disabled>Select...</option>
+                                    <option value="S">Single</option>
+                                    <option value="M">Married</option>
+                                    <option value="D">Divorced</option>
+                                    <option value="W">Widower</option>
                                 </select>
                             </div>
                         </div>
 
                         <div className="row">
                             <div className="col-md-4 mb-3">
-                                <label className="form-label small fw-bold text-secondary">País</label>
+                                <label className="form-label small fw-bold text-secondary">Country</label>
                                 <input
                                     type="text"
                                     name="country"
@@ -258,7 +251,7 @@ const EditProfile = () => {
                             </div>
 
                             <div className="col-md-4 mb-3">
-                                <label className="form-label small fw-bold text-secondary">Cidade</label>
+                                <label className="form-label small fw-bold text-secondary">City</label>
                                 <input
                                     type="text"
                                     name="city"
@@ -270,7 +263,7 @@ const EditProfile = () => {
                             </div>
 
                             <div className="col-md-4 mb-3">
-                                <label className="form-label small fw-bold text-secondary">Telemóvel</label>
+                                <label className="form-label small fw-bold text-secondary">Phone Number</label>
                                 <input
                                     type="tel"
                                     name="phoneNumber"
@@ -298,7 +291,7 @@ const EditProfile = () => {
                                 className="btn btn-primary btn-sm px-4"
                                 disabled={isSaving}
                             >
-                                {isSaving ? 'A guardar...' : 'Guardar Alterações'}
+                                {isSaving ? 'Saving...' : 'Save Changes'}
                             </button>
                         </div>
                     </form>

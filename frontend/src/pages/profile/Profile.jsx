@@ -8,7 +8,7 @@ import {useCallback, useEffect, useState} from "react";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 //import Feed from "../feed/Feed.jsx";
 import Navbar from "../../components/navBar/navBar.jsx";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import PostCard from "../../components/postCard/postCard.jsx";
 
 const Profile= ()=>{
@@ -148,6 +148,21 @@ const Profile= ()=>{
         }
     }, [profileUserId, token, userId]);
 
+    const handleSendRequest = async () => {
+        try {
+            await axios.post('http://localhost:3001/friendShip/request',
+                { friendId: profileUserId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setRelation('P');
+
+        } catch (error) {
+            console.error("Erro ao enviar pedido:", error);
+            alert("Erro ao enviar pedido de amizade. Tenta novamente.");
+        }
+    };
+
     useEffect(() => {
         //const token = localStorage.getItem('token');
         if (!token) {
@@ -203,32 +218,42 @@ const Profile= ()=>{
 
                     <div className="mt-2 mx-2">
                         {String(profileUserId) === String(userId) ? (
-                            // Cenário A: É o meu próprio perfil (Dono)
-                            <button className="btn btn-outline-secondary btn-sm">
-                                <i className="bi bi-gear-fill me-1"></i> Editar Perfil
-                            </button>
+
+                                <Link to="/EditProfile">
+                                    <button className="btn btn-outline-secondary btn-sm">
+                                        <i className="bi bi-gear-fill me-1"></i> Edit Profile
+                                    </button>
+                                </Link>
                         ) : (
                             // Cenário B: Estou a visitar o perfil de outra pessoa (Verifica o State 'relation')
                             <>
                                 {relation === 'F' && (
-                                    <button className="btn btn-success btn-sm align-items-center gap-1" disabled>
+                                    <button className="btn btn-success btn-sm d-flex align-items-center gap-1" disabled>
                                         <i className="bi bi-check-lg"></i> Amigos
                                     </button>
                                 )}
 
-                                {relation === 'B' && (
-                                    <button className="btn btn-warning btn-sm align-items-center gap-1" disabled>
+                                {relation === 'P' && (
+                                    <button className="btn btn-warning btn-sm d-flex align-items-center gap-1" disabled>
                                         <i className="bi bi-clock-history"></i> Pedido Pendente
                                     </button>
                                 )}
 
-                                {relation === 'P' || relation === 'none' && (
-                                    <button className="btn btn-primary btn-sm align-items-center gap-1">
+                                {relation === 'none' && (
+                                    <button
+                                        className="btn btn-primary btn-sm d-flex align-items-center gap-1"
+                                        onClick={handleSendRequest}
+                                    >
                                         <i className="bi bi-person-plus-fill"></i> Adicionar Amigo
                                     </button>
                                 )}
 
-
+                                {/* Opcional: Se 'B' for bloqueado ou outro estado, podes gerir aqui */}
+                                {relation === 'B' && (
+                                    <button className="btn btn-danger btn-sm d-flex align-items-center gap-1" disabled>
+                                        <i className="bi bi-slash-circle"></i> Indisponível
+                                    </button>
+                                )}
                             </>
                         )}
                     </div>

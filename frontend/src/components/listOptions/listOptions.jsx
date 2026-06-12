@@ -9,10 +9,9 @@ const OptionsListWidget = () => {
     const menuOptions = [
         { id: 1, name: 'Profile', icon: 'bi-person-fill text-success', path: '/profile' },
         { id: 2, name: 'Friends', icon: 'bi-people-fill text-info', path: '/friends' },
-        { id: 3, name: 'Posts Liked', icon: 'bi-heart-fill text-danger', path: '/saved' },
-        { id: 4, name: 'Comments Liked', icon: 'bi-heart text-danger', path: '/saved' },
-        { id: 5, name: 'My Comments', icon: 'bi-chat-fill text-secondary', path: '/saved' },
-        { id: 6, name: 'Settings', icon: 'bi-gear-fill text-secondary', path: '/settings' }
+        { id: 3, name: 'Posts Liked', icon: 'bi-heart-fill text-danger', path: '/likedPosts' },
+        { id: 4, name: 'My Comments', icon: 'bi-chat-fill text-secondary', path: '/saved' },
+        { id: 5, name: 'Settings', icon: 'bi-gear-fill text-secondary', path: '/settings' }
     ];
 
     return (

@@ -19,25 +19,69 @@ const formatData = (dataString) => {
     return `${day}/${month}/${year} at ${hours}:${minutes}`;
 };
 
-const CommentItem = ({
-                         comment,
-                         allComments,
-                         isReply = false,
-                         postDate,
-                         currentUserId,
-                         replyingTo,
-                         setReplyingTo,
-                         handleReplyClick,
-                         handleDeleteComment,
-                         editingCommentId,
-                         setEditingCommentId,
-                         editCommentText,
-                         setEditCommentText,
-                         handleUpdateComment,
-                         newComment,
-                         setNewComment,
-                         handleCreateComment
-                     }) => {
+const CommentItem = ({ comment, allComments, isReply = false, postDate, currentUserId, states, actions, depth = 1 }) => {
+
+    const [likesCount, setLikesCount] = useState(0);
+    const [hasLiked, setHasLiked] = useState(false);
+    const token = localStorage.getItem('token');
+
+    const fetchCommentsLikes = useCallback(async() => {
+        if (!token) return;
+
+        try {
+
+            const response = await axios.get(`http://localhost:3001/commentLikes/${comment.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const count = response.data[0].totalLikes;
+            setLikesCount(count);
+
+            const responseUsers = await axios.get(`http://localhost:3001/commentLikes/users/${comment.id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const iLikedIt = responseUsers.data.some(user => String(user.idUser || user.id) === String(currentUserId));
+            setHasLiked(iLikedIt);
+        } catch (error) {
+            console.error("Error loading the likes of the post:", error);
+        }
+    }, [comment.id, token, currentUserId]);
+
+    useEffect(() => {
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchCommentsLikes();
+    }, [fetchCommentsLikes]);
+
+    const handleCommentLike = async () => {
+        const previousHasLiked = hasLiked;
+        const previousLikes = likesCount;
+
+        setHasLiked(!hasLiked);
+        setLikesCount(hasLiked ? likesCount - 1 : likesCount + 1);
+
+        try {
+            if (hasLiked) {
+                await axios.delete(`http://localhost:3001/commentLikes/delete/${comment.id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            } else {
+                await axios.post(`http://localhost:3001/commentLikes/create`, {
+                    idComment: comment.id
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            }
+        } catch (error) {
+            setHasLiked(previousHasLiked);
+            setLikesCount(previousLikes);
+            console.error("Erro ao alterar o like:", error);
+        }
+    };
+
     const replies = allComments.filter(c => c.parentCommentId === comment.id);
 
     return (
@@ -63,28 +107,28 @@ const CommentItem = ({
                         <span className="text-muted small">{formatData(postDate)}</span>
                     </div>
 
-                    {editingCommentId === comment.id ? (
+                    {states.editingCommentId === comment.id ? (
                         <div className="d-flex align-items-center gap-2 mb-2 mt-1 position-relative">
                             <input
                                 type="text"
                                 className="form-control form-control-sm rounded-pill bg-white border-secondary-subtle"
-                                value={editCommentText}
-                                onChange={(e) => setEditCommentText(e.target.value)}
+                                value={states.editCommentText}
+                                onChange={(e) => states.setEditCommentText(e.target.value)}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleUpdateComment(comment.id);
-                                    if (e.key === 'Escape') setEditingCommentId(null);
+                                    if (e.key === 'Enter') actions.handleUpdateComment(comment.id);
+                                    if (e.key === 'Escape') states.setEditingCommentId(null);
                                 }}
                                 autoFocus
                             />
                             <button
                                 className="btn btn-sm btn-primary rounded-pill px-3"
-                                onClick={() => handleUpdateComment(comment.id)}
+                                onClick={() => actions.handleUpdateComment(comment.id)}
                             >
                                 Save
                             </button>
                             <button
                                 className="btn btn-sm btn-light border rounded-pill px-3"
-                                onClick={() => setEditingCommentId(null)}
+                                onClick={() => states.setEditingCommentId(null)}
                             >
                                 Cancel
                             </button>
@@ -94,26 +138,31 @@ const CommentItem = ({
                     )}
 
                     <div className="d-flex gap-3 text-muted small fw-semibold">
-                        <span style={{cursor: 'pointer'}}><i className="bi bi-hand-thumbs-up me-1"></i>0</span>
-
-                        <span
-                            className="text-primary"
-                            style={{cursor: 'pointer'}}
-                            onClick={() => handleReplyClick(comment)}
-                        >
-                            Reply
+                        <span className={`comment-action-btn fw-semibold ${hasLiked ? 'text-primary' : 'text-muted'}`}
+                              onClick={handleCommentLike}
+                              title={hasLiked ? "Unlike" : "Like"}>
+                            <i className={`me-1 ${hasLiked ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'}`}></i>
+                            {likesCount > 0 ? likesCount : 'Like'}
                         </span>
+
+                        {depth < 6 && (
+                            <span
+                                className="text-primary comment-action-btn"
+                                onClick={() => actions.handleReplyClick(comment)}
+                            >
+                                Reply
+                            </span>
+                        )}
 
                         {comment.idUser === Number(currentUserId) && (
 
                             <>
                                 <span
-                                    className="text-secondary"
-                                    style={{cursor: 'pointer'}}
+                                    className="text-secondary comment-action-btn"
                                     onClick={() => {
-                                        setEditingCommentId(comment.id);
-                                        setEditCommentText(comment.commentText);
-                                        setReplyingTo(null);
+                                        states.setEditingCommentId(comment.id);
+                                        states.setEditCommentText(comment.commentText);
+                                        states.setReplyingTo(null);
                                     }}
                                     title="Edit comment"
                                 >
@@ -121,9 +170,8 @@ const CommentItem = ({
                                 </span>
 
                                 <span
-                                    className="text-danger"
-                                    style={{cursor: 'pointer'}}
-                                    onClick={() => handleDeleteComment(comment.id)}
+                                    className="text-danger comment-action-btn"
+                                    onClick={() => actions.handleDeleteComment(comment.id)}
                                     title="Delete comment"
                                 >
                                     Delete
@@ -134,13 +182,12 @@ const CommentItem = ({
                 </div>
             </div>
 
-            {replyingTo && replyingTo.id === comment.id && (
+            {states.replyingTo && states.replyingTo.id === comment.id && (
                 <div className="d-flex gap-3 align-items-center mt-2 mb-3 ms-5 ps-2">
-                    <div className="d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light flex-shrink-0" style={{width: '32px', height: '32px'}}>
+                    <div className="d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light flex-shrink-0 reply-profile-picture">
                         <img
                             src={`/users/${currentUserId}.png`}
                             alt="You"
-                            style={{width: '100%', height: '100%', objectFit: 'cover'}}
                             onError={(e) => e.target.style.display = 'none'}
                         />
                     </div>
@@ -149,16 +196,16 @@ const CommentItem = ({
                             type="text"
                             className="form-control form-control-sm rounded-pill bg-white border-secondary-subtle pe-5"
                             placeholder="Add a reply..."
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
+                            value={states.newComment}
+                            onChange={(e) => states.setNewComment(e.target.value)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleCreateComment();
+                                if (e.key === 'Enter') actions.handleCreateComment();
                             }}
                             autoFocus
                         />
                         <button
                             className="btn btn-sm position-absolute top-50 end-0 translate-middle-y"
-                            onClick={() => setReplyingTo(null)}
+                            onClick={() => states.setReplyingTo(null)}
                             title="Cancel"
                         >
                             <i className="bi bi-x-circle-fill text-muted"></i>
@@ -177,18 +224,9 @@ const CommentItem = ({
                             isReply={true}
                             postDate={postDate}
                             currentUserId={currentUserId}
-                            replyingTo={replyingTo}
-                            setReplyingTo={setReplyingTo}
-                            handleReplyClick={handleReplyClick}
-                            handleDeleteComment={handleDeleteComment}
-                            editingCommentId={editingCommentId}
-                            setEditingCommentId={setEditingCommentId}
-                            editCommentText={editCommentText}
-                            setEditCommentText={setEditCommentText}
-                            handleUpdateComment={handleUpdateComment}
-                            newComment={newComment}
-                            setNewComment={setNewComment}
-                            handleCreateComment={handleCreateComment}
+                            states={states}
+                            actions={actions}
+                            depth={depth + 1}
                         />
                     )}
                 </div>
@@ -306,6 +344,20 @@ const PostPage = () => {
 
     const topLevelComments = comments.filter(c => !c.parentCommentId);
 
+    const commentStates = {
+        replyingTo, setReplyingTo,
+        editingCommentId, setEditingCommentId,
+        editCommentText, setEditCommentText,
+        newComment, setNewComment
+    };
+
+    const commentActions = {
+        handleReplyClick,
+        handleDeleteComment,
+        handleUpdateComment,
+        handleCreateComment
+    };
+
     if (isLoading) return <div className="text-center mt-5 text-muted">Loading...</div>;
 
 
@@ -370,20 +422,9 @@ const PostPage = () => {
                                             isReply={false}
                                             postDate={post.postDate}
                                             currentUserId={currentUserId}
-                                            replyingTo={replyingTo}
-                                            setReplyingTo={setReplyingTo}
-                                            handleReplyClick={handleReplyClick}
-                                            handleDeleteComment={handleDeleteComment}
-                                            editingCommentId={editingCommentId}
-                                            setEditingCommentId={setEditingCommentId}
-                                            editCommentText={editCommentText}
-                                            setEditCommentText={setEditCommentText}
-                                            handleUpdateComment={handleUpdateComment}
-                                            newComment={newComment}
-                                            setNewComment={setNewComment}
-                                            handleCreateComment={handleCreateComment}
+                                            states={commentStates}
+                                            actions={commentActions}
                                         />
-
                                     )
                                 )}
                             </div>
