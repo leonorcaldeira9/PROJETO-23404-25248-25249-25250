@@ -39,7 +39,11 @@ const EditProfile = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
+
                 const userData = response.data;
+
+
+                console.log("DEBUG: Fetched User Data ->", userData);
 
                 // Pre-fill state with existing data.
                 setFormData({
@@ -86,11 +90,22 @@ const EditProfile = () => {
             delete payload.loginPassword;
         }
 
+        Object.keys(payload).forEach(key => {
+            if (payload[key] === "") {
+                payload[key] = null;
+            }
+        });
+
         try {
+
             await axios.put(`http://localhost:3001/users/update/${userId}`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+
+            localStorage.setItem('userName', formData.fullName);
+            window.dispatchEvent(new Event('perfilAtualizado'));
+
 
             setMessage({ text: 'Perfil atualizado com sucesso!', type: 'success' });
 
@@ -99,9 +114,23 @@ const EditProfile = () => {
             }, 1500);
 
         } catch (error) {
-            console.error("=== ERROR FROM BACKEND ===");
-            console.log("Status Code:", error.response?.status);
-            console.log("Error Message:", error.response?.data);
+
+            console.log("DEBUG: Full Error Object ->", error);
+
+            if (error.response) {
+                // O backend respondeu com um erro (ex: 400, 404, 500)
+                console.log("Status Code:", error.response.status);
+                console.log("Error Data:", error.response.data);
+                setMessage({ text: 'Erro ao salvar as alterações. Verifica os dados.', type: 'danger' });
+            } else if (error.request) {
+                // O pedido foi feito, mas não houve qualquer resposta do servidor
+                console.log("DEBUG: No response received. Check if backend is running on port 3001.");
+                setMessage({ text: 'O servidor não respondeu. Verifica se o backend está ligado.', type: 'danger' });
+            } else {
+                // Alguma coisa correu mal a montar o próprio pedido
+                console.log("DEBUG: Request Setup Error ->", error.message);
+                setMessage({ text: 'Erro interno ao preparar o pedido.', type: 'danger' });
+            }
 
             setMessage({ text: 'Erro ao salvar as alterações.', type: 'danger' });
         } finally {
@@ -226,7 +255,6 @@ const EditProfile = () => {
                                     className="form-select"
                                     value={formData.maritalStatus}
                                     onChange={handleChange}
-                                    required
                                 >
                                     <option value="" disabled>Select...</option>
                                     <option value="S">Single</option>
@@ -276,6 +304,23 @@ const EditProfile = () => {
                             </div>
                         </div>
 
+                        <div className="row mb-3">
+                            <div className="col-md-4">
+                                <label className="form-label small fw-bold text-secondary">Profile Privacy</label>
+                                <select
+                                    name="privacy"
+                                    className="form-select"
+                                    value={formData.privacy}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    <option value="pu">Public (Everyone can see)</option>
+                                    <option value="pr">Private (Only friends)</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div className="d-flex gap-2 justify-content-end mt-4">
                             <button
                                 type="button"
@@ -283,7 +328,7 @@ const EditProfile = () => {
                                 onClick={() => navigate('/profile')}
                                 disabled={isSaving}
                             >
-                                Cancelar
+                                Cancel
                             </button>
 
                             <button

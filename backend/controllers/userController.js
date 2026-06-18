@@ -111,8 +111,12 @@ const updateUser = (req, res) => {
         return res.status(403).json({ error: "Access denied: You can only update your own profile." });
     }
 
-    if(!req.body.fullName || !req.body.gender || !req.body.birthDate || !req.body.maritalStatus || !req.body.city || !req.body.country || !req.body.email || !req.body.phoneNumber) {
+    if(!req.body.fullName || !req.body.gender || !req.body.birthDate || !req.body.city || !req.body.country || !req.body.email || !req.body.phoneNumber) {
         return res.status(400).json({ error: "Please fill in all required fields." })
+    }
+
+    if(req.body.maritalSatus === ""){
+        req.body.maritalSatus = null;
     }
 
     if (req.body.loginPassword) {

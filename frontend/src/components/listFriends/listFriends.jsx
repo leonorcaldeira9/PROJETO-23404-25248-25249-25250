@@ -7,7 +7,6 @@ import './listFriends.css';
 const FriendAvatar = ({ friend }) => {
     const [hasError, setHasError] = useState(false);
 
- 
 
     if (friend.id && !hasError) {
         return (

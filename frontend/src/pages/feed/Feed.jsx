@@ -12,6 +12,8 @@ const Feed = () => {
 
     const [posts, setPosts] = useState([]);
     const [newPostText, setNewPostText] = useState("");
+    const [visibility, setVisibility] = useState('pr');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
 
@@ -39,7 +41,7 @@ const Feed = () => {
         try {
             await axios.post('http://localhost:3001/posts/create', {
                 postText: newPostText,
-                visibility: 'pr'
+                visibility: visibility
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -47,6 +49,7 @@ const Feed = () => {
             });
 
             setNewPostText("");
+            setVisibility("pr");
             fetchFeed();
 
         } catch (error) {
@@ -89,9 +92,48 @@ const Feed = () => {
                                 rows="2"
                                 placeholder="What's on your mind?"
                                 value={newPostText}
-                                onChange={(e) => setNewPostText(e.target.value)}
-                            ></textarea>
-                            <div className="text-end">
+                                onChange={(e) => setNewPostText(e.target.value)}>
+                            </textarea>
+
+                            <div className="d-flex justify-content-between align-items-center mt-2 border-top pt-3">
+                                <div className="dropdown">
+                                    <button className="btn btn-light btn-sm dropdown-toggle fw-semibold text-secondary border shadow-sm"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                            onBlur={() => setTimeout(() => setIsDropdownOpen(false), 150)}
+                                    >
+                                        {visibility === 'pr' ? (
+                                            <><i className="bi bi-lock me-1"></i>Private</>
+                                        ) : (
+                                            <><i className="bi bi-globe-europe-africa me-1"></i>Public</>
+                                        )}
+                                    </button>
+                                    <ul className={`dropdown-menu shadow border-0 mt-1 ${isDropdownOpen ? 'show' : ''}`}>
+                                        <li>
+                                            <button className="dropdown-item d-flex align-items-center gap-2"
+                                                onClick={() => {
+                                                    setVisibility('pu');
+                                                    setIsDropdownOpen(false);
+                                                }}
+                                            >
+                                                <i className="bi bi-globe-europe-africa me-1"></i>Public
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button className="dropdown-item d-flex align-items-center gap-2"
+                                                onClick={() =>  {
+                                                    setVisibility('pr');
+                                                    setIsDropdownOpen(false);
+                                                }}
+                                            >
+                                                <i className="bi bi-lock me-1"></i>Private
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+
                                 <button className="btn btn-primary px-4" onClick={handleCreatePost}>
                                     <i className="bi bi-send-plus-fill me-2"></i>
                                     Post
@@ -103,7 +145,7 @@ const Feed = () => {
                             <p className="text-center text-muted">There are no posts in your feed yet.</p>
                         ) : (
                             posts.map((post) => (
-                                <PostCard key={post.id} post={post} token={token} />
+                                <PostCard key={post.id} post={post} token={token}/>
                             ))
                         )}
                     </div>

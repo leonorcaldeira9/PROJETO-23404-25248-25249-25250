@@ -96,8 +96,8 @@ const LikedPosts = () => {
 
                     <div className="text-center p-5 bg-white rounded shadow-sm border-0 mt-3">
                         <i className="bi bi-heartbreak fs-1 text-muted mb-2"></i>
-                        <h6 className="text-secondary mt-2">no liked posts</h6>
-                        <small className="text-muted">you haven't like anything</small>
+                        <h6 className="text-secondary mt-2">No liked posts</h6>
+                        <small className="text-muted">You haven't like anything</small>
                     </div>
                 ) : (
 

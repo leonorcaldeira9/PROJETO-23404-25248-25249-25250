@@ -1,5 +1,6 @@
 import Navbar from "../../components/navBar/navBar.jsx";
 import {useCallback, useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
 
 
@@ -10,6 +11,7 @@ const Notifications = () => {
 
     const token = localStorage.getItem('token');
     const currentUserId = localStorage.getItem('userId');
+    const navigate = useNavigate();
 
     const fetchData = useCallback(async () => {
         if (!token) return;
@@ -17,17 +19,42 @@ const Notifications = () => {
             const requestsRes = await axios.get('http://localhost:3001/friendShip/requests/pending', {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setNotifications(requestsRes.data);
+
+            // Get all requests from database
+            const allRequests = requestsRes.data;
+
+            // Filter: keep only requests where the current user is the receiver
+            const incomingRequests = allRequests.filter(req =>
+                String(req.receiverId) === String(currentUserId)
+            );
+
+            // Set only the incoming requests to be shown as notifications
+            setNotifications(incomingRequests);
 
             const usersRes = await axios.get('http://localhost:3001/users', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            let filteredUsers = usersRes.data.filter(u => String(u.id) !== String(currentUserId));
+            const friendsRes = await axios.get(`http://localhost:3001/friendShip/user/${currentUserId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const allUsers = usersRes.data;
+            const myFriends = friendsRes.data;
+            const pendingRequests = requestsRes.data;
+
+            let filteredUsers = allUsers.filter(user => {
+                const isSelf = String(user.id) === String(currentUserId);
+                const isAlreadyFriend = myFriends.some(friend => String(friend.id) === String(user.id));
+                const isPendingRequest = pendingRequests.some(req => String(req.id) === String(user.id));
+
+                return !isSelf && !isAlreadyFriend && !isPendingRequest;
+            });
+
             setPotentialFriends(filteredUsers);
 
         } catch (error) {
-            console.error("Erro ao carregar dados:", error);
+            console.error("Error loading data:", error);
         }
     }, [token, currentUserId]);
 
@@ -45,7 +72,7 @@ const Notifications = () => {
             alert("Friend request sent!");
             setPotentialFriends(potentialFriends.filter(user => user.id !== targetUserId));
         } catch (error) {
-            console.error("Erro ao enviar pedido:", error);
+            console.error("Error sending the friend request:", error);
             alert("Error sending request or request already exists.");
         }
     };
@@ -58,7 +85,7 @@ const Notifications = () => {
             );
             fetchData();
         } catch (error) {
-            console.error("Erro ao aceitar pedido:", error);
+            console.error("Error acepting friend request:", error);
         }
     };
 
@@ -69,8 +96,23 @@ const Notifications = () => {
             });
             fetchData();
         } catch (error) {
-            console.error("Erro ao recusar pedido:", error);
+            console.error("Error declining friend request:", error);
         }
+    };
+
+    const onAcceptClick = (e, senderId) => {
+        e.stopPropagation();
+        handleAccept(senderId).catch(err => console.error("Click error:", err));
+    };
+
+    const onDeclineClick = (e, senderId) => {
+        e.stopPropagation();
+        handleDecline(senderId).catch(err => console.error("Click error:", err));
+    };
+
+    const onSendRequestClick = (e, targetUserId) => {
+        e.stopPropagation();
+        handleSendRequest(targetUserId).catch(err => console.error("Click error:", err));
     };
 
     return (
@@ -79,7 +121,6 @@ const Notifications = () => {
             <div className="container mt-4">
                 <div className="row">
 
-                    {/* COLUNA ESQUERDA: NOTIFICAÇÕES (Pedidos Recebidos) */}
                     <div className="col-md-7 mb-4">
                         <h4 className="fw-bold mb-3">Notifications</h4>
                         <div className="card shadow-sm border-0 p-3">
@@ -91,10 +132,14 @@ const Notifications = () => {
                             ) : (
                                 <div className="list-group list-group-flush">
                                     {notifications.map(notif => (
-                                        <div key={notif.id} className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 bg-light mb-2 rounded border-0">
+                                        <div key={notif.id}
+                                             className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 bg-light mb-2 rounded border-0"
+                                             style={{ cursor: 'pointer' }}
+                                             onClick={() => navigate(`/profile/${notif.id}`)}
+                                        >
 
                                             <div className="d-flex align-items-center gap-3 w-100">
-                                                {/* Foto de quem enviou o pedido */}
+
                                                 <div className="bg-white rounded-circle overflow-hidden d-flex justify-content-center align-items-center flex-shrink-0 shadow-sm" style={{width: '55px', height: '55px'}}>
                                                     <img
                                                         src={`/users/${notif.id}.png`}
@@ -108,25 +153,22 @@ const Notifications = () => {
                                                     <i className="bi bi-person-circle text-secondary d-none" style={{fontSize: '45px'}}></i>
                                                 </div>
 
-                                                {/* Texto estilo notificação */}
                                                 <div className="w-100">
                                                     <p className="mb-2 text-dark">
                                                         <span className="fw-bold">{notif.fullName}</span> sent you a friend request.
                                                     </p>
 
-                                                    {/* Botões Aceitar/Recusar */}
                                                     <div className="d-flex gap-2">
-                                                        <button className="btn btn-sm btn-primary fw-semibold px-4" onClick={() => handleAccept(notif.id)}>
+                                                        <button className="btn btn-sm btn-primary fw-semibold px-4" onClick={(e) => onAcceptClick(e, notif.id)}>
                                                             Accept
                                                         </button>
-                                                        <button className="btn btn-sm btn-secondary fw-semibold px-4" onClick={() => handleDecline(notif.id)}>
+                                                        <button className="btn btn-sm btn-secondary fw-semibold px-4" onClick={(e) => onDeclineClick(e, notif.id)}>
                                                             Decline
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Bolinha Azul a indicar "Novo" */}
                                             <div className="bg-primary rounded-circle ms-2 flex-shrink-0" style={{ width: '10px', height: '10px' }}></div>
                                         </div>
                                     ))}
@@ -135,7 +177,6 @@ const Notifications = () => {
                         </div>
                     </div>
 
-                    {/* COLUNA DIREITA: DESCOBRIR PESSOAS (RFG2) */}
                     <div className="col-md-5 mb-4">
                         <h5 className="fw-bold mb-3 text-secondary">Discover People</h5>
                         <div className="card shadow-sm border-0 p-3">
@@ -144,7 +185,11 @@ const Notifications = () => {
                             ) : (
                                 <ul className="list-group list-group-flush">
                                     {potentialFriends.map(user => (
-                                        <li key={user.id} className="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                        <li key={user.id}
+                                            className="list-group-item d-flex justify-content-between align-items-center px-0 py-2"
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => navigate(`/profile/${user.id}`)}
+                                        >
                                             <div className="d-flex align-items-center gap-2">
                                                 <div className="bg-light rounded-circle overflow-hidden d-flex justify-content-center align-items-center flex-shrink-0" style={{width: '40px', height: '40px'}}>
                                                     <img
@@ -162,7 +207,7 @@ const Notifications = () => {
                                             </div>
                                             <button
                                                 className="btn btn-sm btn-light border fw-semibold text-primary"
-                                                onClick={() => handleSendRequest(user.id)}
+                                                onClick={(e) => onSendRequestClick(e, user.id)}
                                                 title="Send Friend Request"
                                             >
                                                 <i className="bi bi-person-plus-fill"></i> Add

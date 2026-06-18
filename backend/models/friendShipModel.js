@@ -78,9 +78,14 @@ const FriendshipModel = {
         });
     },
 
-    getPendingRequests: (idUser, callback) => {
+    /*getPendingRequests: (idUser, callback) => {
         const sql = 'SELECT U.id, U.fullName, U.email, F.friendDate FROM friendship AS F JOIN users AS U ON U.id = F.userId AND U.id != ? WHERE ( F.friendId = ?) AND F.friendshipStatus = "P"';
         db.query(sql, [idUser, idUser], callback);
+    }*/
+
+    getPendingRequests: (idUser, callback) => {
+        const sql = 'SELECT U.id, U.fullName, U.email, F.friendDate, F.userId AS senderId, F.friendId AS receiverId FROM friendship AS F JOIN users AS U ON (U.id = F.userId OR U.id = F.friendId) WHERE (F.userId = ? OR F.friendId = ?) AND U.id != ? AND F.friendshipStatus = "P"';
+        db.query(sql, [idUser, idUser, idUser], callback);
     }
 };
 

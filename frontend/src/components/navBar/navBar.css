@@ -13,3 +13,9 @@
     font-size: 35px;
     display: flex;
 }
+
+.notification-count {
+    top: 0;
+    right: 0;
+    font-size: 0.65rem;
+}
