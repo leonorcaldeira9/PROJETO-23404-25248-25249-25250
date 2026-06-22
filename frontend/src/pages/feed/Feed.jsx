@@ -82,7 +82,6 @@ const Feed = () => {
             return;
         }
 
-
         fetchFeed();
 
     }, [navigate, token, fetchFeed]);

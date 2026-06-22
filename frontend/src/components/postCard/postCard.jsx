@@ -123,7 +123,6 @@ const PostCard = ({ post, token, viewComments = false, onPostUpdate}) => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchLikes();
         fetchComments();
-        //fetchPostImage();
     }, [fetchLikes, fetchComments ]);
 
     useEffect(() => {
@@ -216,22 +215,13 @@ const PostCard = ({ post, token, viewComments = false, onPostUpdate}) => {
 
                         <div
                             className="me-2 d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-light user-profile-picture">
-                            {/*{(!authorId || imageError) ? (*/}
-                            {/*    <i className="bi bi-person-circle text-secondary user-profile-picture-default"></i>*/}
-                            {/*) : (*/}
-                            {/*    <img*/}
-                            {/*        src={photoUrl}*/}
-                            {/*        alt={`Photo of ${post.fullName}`}*/}
-                            {/*        onError={() => setImageError(true)}*/}
-                            {/*    />*/}
-                            {/*)}*/}
+
                             <i className="bi bi-person-circle text-secondary user-profile-picture-default"></i>
                             {authorId && !imageError && (
                                 <img
                                     src={photoUrl}
                                     alt={`Photo of ${post.fullName}`}
                                     className="position-absolute top-0 start-0 w-100 h-100"
-                                    style={{ objectFit: 'cover', zIndex: 1 }}
                                     onError={() => setImageError(true)}
                                     loading="lazy"
                                 />
@@ -258,7 +248,7 @@ const PostCard = ({ post, token, viewComments = false, onPostUpdate}) => {
                             </button>
 
                             {isOpen && (
-                                <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm" style={{ minWidth: '200px' }}>
+                                <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm dropdown-menu-size">
 
                                     <button
 
@@ -319,9 +309,7 @@ const PostCard = ({ post, token, viewComments = false, onPostUpdate}) => {
                 <div className="d-flex justify-content-between">
                     <div className="d-flex gap-2">
                         <button
-                            // className={`btn btn-sm fw-semibold ${hasLiked ? 'text-primary' : 'text-secondary btn-light'}`}
-                            // style={hasLiked ? { backgroundColor: '#e7f0fd' } : {}}
-                            // onClick={handleLike}
+
                             className={`btn btn-sm fw-semibold ${
                                 hasLiked
                                     ? 'text-primary btn-liked' 

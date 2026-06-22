@@ -1,10 +1,11 @@
-
 import Navbar from '../../components/navBar/navBar.jsx';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import "../../pages/pendingRelationship/pendingRelationship.css"
+import AlertModal from "../../components/alertModal/alertModal.jsx";
 
 const PendingRelationshipPage = () => {
     const navigate = useNavigate();
@@ -14,6 +15,19 @@ const PendingRelationshipPage = () => {
     const [blockedList, setBlockedList] = useState([]);
     const [pendingList, setPendingList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: ''
+    });
+
+    const closeModal = () => {
+        setModal({ ...modal, isOpen: false });
+    };
+
+    const [confirmAction, setConfirmAction] = useState({ isOpen: false, targetUserId: null, type: null });
 
 
     const fetchConnections = useCallback(async () => {
@@ -54,13 +68,19 @@ const PendingRelationshipPage = () => {
         fetchConnections();
     }, [navigate, fetchConnections, token]);
 
+    const triggerRemoveConnection = (targetUserId, type) => {
+        setConfirmAction({
+            isOpen: true,
+            targetUserId: targetUserId,
+            type: type
+        });
+    };
 
-    const handleRemoveConnection = async (targetUserId, type) => {
-        const message = type === 'block'
-            ? "Are you sure you want to unblock this user?"
-            : "Are you sure you want to cancel this friend request?";
 
-        if (!window.confirm(message)) return;
+    const handleRemoveConnection = async () => {
+        const { targetUserId, type } = confirmAction;
+
+        setConfirmAction({ isOpen: false, targetUserId: null, type: null });
 
         try {
             await axios.delete(`http://localhost:3001/friendShip/delete/${targetUserId}`, {
@@ -75,7 +95,12 @@ const PendingRelationshipPage = () => {
             }
         } catch (error) {
             console.error(`Error removing connection (${type}):`, error);
-            alert("An error occurred. Try again.");
+            setModal({
+                isOpen: true,
+                title: 'Error',
+                message: "An error occurred. Please try again.",
+                type: 'error'
+            });
         }
     };
 
@@ -84,10 +109,10 @@ const PendingRelationshipPage = () => {
     }
 
     return (
-        <div className="background" style={{ minHeight: '100vh' }}>
+        <div className="background page min-vh-100 pb-3">
             <Navbar />
 
-            <div className="container mt-5 mb-5" style={{ maxWidth: '1000px' }}>
+            <div className="container mt-5 mb-5 settings-container">
 
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="fw-bold text-dark mb-0">
@@ -120,7 +145,7 @@ const PendingRelationshipPage = () => {
                                         <div key={user.id} className="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-center py-3 border rounded shadow-sm gap-3">
 
                                             <div className="d-flex align-items-center cursor-pointer" onClick={() => navigate(`/profile/${user.id}`)}>
-                                                <div className="rounded-circle overflow-hidden bg-light border me-3 d-flex justify-content-center align-items-center flex-shrink-0" style={{ width: '45px', height: '45px' }}>
+                                                <div className="rounded-circle overflow-hidden bg-light border me-3 d-flex justify-content-center align-items-center flex-shrink-0 avatar-box">
                                                     <img
                                                         src={`/users/${user.id}.png`}
                                                         alt="Profile"
@@ -130,13 +155,13 @@ const PendingRelationshipPage = () => {
                                                             e.target.nextElementSibling.classList.remove('d-none');
                                                         }}
                                                     />
-                                                    <i className="bi bi-person-circle text-secondary d-none" style={{fontSize: '35px'}}></i>
+                                                    <i className="bi bi-person-circle text-secondary d-none icon"></i>
                                                 </div>
                                                 <h6 className="mb-0 fw-bold text-dark">{user.fullName}</h6>
                                             </div>
 
                                             <div className="d-flex gap-2 w-100 w-sm-auto justify-content-end">
-                                                <button onClick={() => handleRemoveConnection(user.id, 'pending')} className="btn btn-outline-danger btn-sm fw-semibold flex-grow-1 flex-sm-grow-0">
+                                                <button onClick={() => triggerRemoveConnection(user.id, 'pending')} className="btn btn-outline-danger btn-sm fw-semibold flex-grow-1 flex-sm-grow-0">
                                                     Cancel
                                                 </button>
                                             </div>
@@ -165,7 +190,7 @@ const PendingRelationshipPage = () => {
                                         <div key={user.id} className="list-group-item d-flex justify-content-between align-items-center py-3 border rounded shadow-sm gap-2">
 
                                             <div className="d-flex align-items-center cursor-pointer" onClick={() => navigate(`/profile/${user.id}`)}>
-                                                <div className="rounded-circle overflow-hidden bg-light border me-3 d-flex justify-content-center align-items-center flex-shrink-0" style={{ width: '45px', height: '45px' }}>
+                                                <div className="rounded-circle overflow-hidden bg-light border me-3 d-flex justify-content-center align-items-center flex-shrink-0 avatar-box">
                                                     <img
                                                         src={`/users/${user.id}.png`}
                                                         alt="Profile"
@@ -175,12 +200,12 @@ const PendingRelationshipPage = () => {
                                                             e.target.nextElementSibling.classList.remove('d-none');
                                                         }}
                                                     />
-                                                    <i className="bi bi-person-circle text-secondary d-none" style={{fontSize: '35px'}}></i>
+                                                    <i className="bi bi-person-circle text-secondary d-none icon"></i>
                                                 </div>
                                                 <h6 className="mb-0 fw-bold text-dark">{user.fullName}</h6>
                                             </div>
 
-                                            <button onClick={() => handleRemoveConnection(user.id, 'block')} className="btn btn-outline-primary btn-sm fw-semibold">
+                                            <button onClick={() => triggerRemoveConnection(user.id, 'block')} className="btn btn-outline-primary btn-sm fw-semibold">
                                                 Unblock
                                             </button>
                                         </div>
@@ -192,6 +217,24 @@ const PendingRelationshipPage = () => {
 
                 </div>
             </div>
+            <AlertModal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                onClose={closeModal}
+            />
+
+            <AlertModal
+                isOpen={confirmAction.isOpen}
+                title={confirmAction.type === 'block' ? "Unblock User" : "Cancel Request"}
+                message={confirmAction.type === 'block'
+                    ? "Are you sure you want to unblock this user?"
+                    : "Are you sure you want to cancel this friend request?"}
+                type="error"
+                onClose={() => setConfirmAction({ isOpen: false, targetUserId: null, type: null })}
+                onConfirm={handleRemoveConnection}
+            />
         </div>
     );
 };

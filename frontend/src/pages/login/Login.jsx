@@ -88,30 +88,31 @@ const Login = () => {
 
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-4 mt-5">
-                                    <label className="form-label fw-bold text-dark">Email</label>
+                                    <label htmlFor="emailInput" className="form-label fw-bold text-dark">Email</label>
                                     <input
+                                        id="emailInput"
                                         type="email"
                                         name="email"
                                         value={formLoginData.email}
                                         onChange={handleChange}
-                                        className="form-control form-control-lg bg-light border-0"
+                                        className="form-control form-control-lg bg-light border-0 fs-6"
                                         placeholder="username@gmail.com"
                                         required
-                                        style={{fontSize: '1rem'}}
+                                        autoComplete="email"
                                     />
                                 </div>
 
                                 <div className="mb-5">
-                                    <label className="form-label fw-bold text-dark">Password</label>
+                                    <label htmlFor="passwordInput" className="form-label fw-bold text-dark">Password</label>
                                     <input
+                                        id="passwordInput"
                                         type="password"
                                         name="loginPassword"
                                         value={formLoginData.loginPassword}
                                         onChange={handleChange}
-                                        className="form-control form-control-lg bg-light border-0"
+                                        className="form-control form-control-lg bg-light border-0 fs-6"
                                         placeholder="***********"
                                         required
-                                        style={{fontSize: '1rem'}}
                                     />
                                 </div>
 

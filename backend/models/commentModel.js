@@ -7,7 +7,6 @@ const CommentModel = {
     },
 
     getCommentsByPost: (idPost, callback) => {
-        //const sql = 'SELECT * FROM comments WHERE idPost=? ORDER BY commentDate ASC';
         const sql = 'SELECT C.*,U.fullName FROM comments as C join users as U on C.idUser=U.id WHERE idPost=? ORDER BY commentDate ASC';
         db.query(sql, [idPost], callback);
     },

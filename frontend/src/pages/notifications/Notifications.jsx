@@ -2,7 +2,8 @@ import Navbar from "../../components/navBar/navBar.jsx";
 import {useCallback, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
-
+import AlertModal from "../../components/alertModal/alertModal.jsx";
+import "../notifications/notifications.css"
 
 const Notifications = () => {
 
@@ -13,6 +14,17 @@ const Notifications = () => {
     const currentUserId = localStorage.getItem('userId');
     const navigate = useNavigate();
 
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: ''
+    });
+
+    const closeModal = () => {
+        setModal({ ...modal, isOpen: false });
+    };
+
     const fetchData = useCallback(async () => {
         if (!token) return;
         try {
@@ -20,15 +32,12 @@ const Notifications = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            // Get all requests from database
             const allRequests = requestsRes.data;
 
-            // Filter: keep only requests where the current user is the receiver
             const incomingRequests = allRequests.filter(req =>
                 String(req.receiverId) === String(currentUserId)
             );
 
-            // Set only the incoming requests to be shown as notifications
             setNotifications(incomingRequests);
 
             const usersRes = await axios.get('http://localhost:3001/users', {
@@ -77,11 +86,21 @@ const Notifications = () => {
                 { friendId: targetUserId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert("Friend request sent!");
+            setModal({
+                isOpen: true,
+                title: 'Sent',
+                message: "The request was sent successfully",
+                type: 'success'
+            });
             setPotentialFriends(potentialFriends.filter(user => user.id !== targetUserId));
         } catch (error) {
             console.error("Error sending the friend request:", error);
-            alert("Error sending request or request already exists.");
+            setModal({
+                isOpen: true,
+                title: 'Friend Request Failed',
+                message: "Error sending request or request already exists.",
+                type: 'error'
+            });
         }
     };
 
@@ -95,6 +114,12 @@ const Notifications = () => {
             window.dispatchEvent(new Event('notificationsUpdate'));
         } catch (error) {
             console.error("Error acepting friend request:", error);
+            setModal({
+                isOpen: true,
+                title: 'Action Failed',
+                message: "The request could not be accepted. Please try again.",
+                type: 'error'
+            });
         }
     };
 
@@ -107,6 +132,12 @@ const Notifications = () => {
             window.dispatchEvent(new Event('notificationsUpdate'));
         } catch (error) {
             console.error("Error declining friend request:", error);
+            setModal({
+                isOpen: true,
+                title: 'Action Failed',
+                message: "The request could not be declined. Please try again.",
+                type: 'error'
+            });
         }
     };
 
@@ -136,31 +167,30 @@ const Notifications = () => {
                         <div className="card shadow-sm border-0 p-3">
                             {notifications.length === 0 ? (
                                 <div className="text-center p-4">
-                                    <i className="bi bi-bell-slash text-muted mb-2 d-block" style={{fontSize: '2rem'}}></i>
+                                    <i className="bi bi-bell-slash text-muted mb-2 d-block fs-2"></i>
                                     <p className="text-muted mb-0">You have no new notifications.</p>
                                 </div>
                             ) : (
                                 <div className="list-group list-group-flush">
                                     {notifications.map(notif => (
                                         <div key={notif.id}
-                                             className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 bg-light mb-2 rounded border-0"
-                                             style={{ cursor: 'pointer' }}
+                                             className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 bg-light mb-2 rounded border-0 notification-cursor"
                                              onClick={() => navigate(`/profile/${notif.id}`)}
                                         >
 
                                             <div className="d-flex align-items-center gap-3 w-100">
 
-                                                <div className="bg-white rounded-circle overflow-hidden d-flex justify-content-center align-items-center flex-shrink-0 shadow-sm" style={{width: '55px', height: '55px'}}>
+                                                <div className="bg-white rounded-circle overflow-hidden d-flex justify-content-center align-items-center flex-shrink-0 shadow-sm avatar-container">
                                                     <img
                                                         src={`/users/${notif.id}.png`}
                                                         alt="User"
-                                                        style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                                                        className="w-100 h-100 object-fit-cover"
                                                         onError={(e) => {
                                                             e.target.classList.add('d-none');
                                                             e.target.nextElementSibling.classList.remove('d-none');
                                                         }}
                                                     />
-                                                    <i className="bi bi-person-circle text-secondary d-none" style={{fontSize: '45px'}}></i>
+                                                    <i className="bi bi-person-circle text-secondary d-none avatar-icon"></i>
                                                 </div>
 
                                                 <div className="w-100">
@@ -179,7 +209,7 @@ const Notifications = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="bg-primary rounded-circle ms-2 flex-shrink-0" style={{ width: '10px', height: '10px' }}></div>
+                                            <div className="bg-primary rounded-circle ms-2 flex-shrink-0 notification-dot"></div>
                                         </div>
                                     ))}
                                 </div>
@@ -196,22 +226,21 @@ const Notifications = () => {
                                 <ul className="list-group list-group-flush">
                                     {potentialFriends.map(user => (
                                         <li key={user.id}
-                                            className="list-group-item d-flex justify-content-between align-items-center px-0 py-2"
-                                            style={{ cursor: 'pointer' }}
+                                            className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 notification-cursor"
                                             onClick={() => navigate(`/profile/${user.id}`)}
                                         >
                                             <div className="d-flex align-items-center gap-2">
-                                                <div className="bg-light rounded-circle overflow-hidden d-flex justify-content-center align-items-center flex-shrink-0" style={{width: '40px', height: '40px'}}>
+                                                <div className="bg-light rounded-circle overflow-hidden d-flex justify-content-center align-items-center flex-shrink-0 avatar-small">
                                                     <img
                                                         src={`/users/${user.id}.png`}
                                                         alt="User"
-                                                        style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                                                        className="w-100 h-100 object-fit-cover"
                                                         onError={(e) => {
                                                             e.target.classList.add('d-none');
                                                             e.target.nextElementSibling.classList.remove('d-none');
                                                         }}
                                                     />
-                                                    <i className="bi bi-person-circle text-secondary d-none" style={{fontSize: '30px'}}></i>
+                                                    <i className="bi bi-person-circle text-secondary d-none avatar-icon-small"></i>
                                                 </div>
                                                 <span className="fw-semibold text-dark">{user.fullName}</span>
                                             </div>
@@ -231,6 +260,13 @@ const Notifications = () => {
 
                 </div>
             </div>
+            <AlertModal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                onClose={closeModal}
+            />
         </div>
     );
 

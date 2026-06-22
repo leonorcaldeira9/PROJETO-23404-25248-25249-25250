@@ -1,0 +1,26 @@
+.notification-cursor {
+    cursor: pointer;
+}
+
+.avatar-container {
+    width: 55px;
+    height: 55px;
+}
+
+.avatar-icon {
+    font-size: 45px;
+}
+
+.notification-dot {
+    width: 10px;
+    height: 10px;
+}
+
+.avatar-small {
+    width: 40px;
+    height: 40px;
+}
+
+.avatar-icon-small {
+    font-size: 30px;
+}

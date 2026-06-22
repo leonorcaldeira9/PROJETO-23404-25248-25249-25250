@@ -44,7 +44,7 @@ const Register = () => {
             setModal({
                 isOpen: true,
                 title: 'Success!',
-                message: response.data.message,
+                message: response.data.message || 'Account successfully created! You can now log in..',
                 type: 'success'
             });
 
@@ -54,7 +54,7 @@ const Register = () => {
                 setModal({
                     isOpen: true,
                     title: 'Fill up all fields!',
-                    message: error.response.data.message,
+                    message: error.response.data.message || 'Please fill in all fields correctly.',
                     type: 'error'
                 });
 
@@ -64,7 +64,7 @@ const Register = () => {
                 setModal({
                     isOpen: true,
                     title: 'Error!',
-                    message: 'The server failed.',
+                    message: 'Unable to connect to the server. Try again later..',
                     type: 'error'
                 });
             }
@@ -98,45 +98,48 @@ const Register = () => {
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-2">
-                        <label className="form-label fw-bold text-dark">Full Name</label>
+                        <label htmlFor="fullNameInput" className="form-label fw-bold text-dark">Full Name</label>
                         <input
+                            id="fullNameInput"
                             type="text"
                             name="fullName"
                             value={formData.fullName}
                             onChange={handleChange}
-                            className="form-control form-control-lg bg-light border-0"
+                            className="form-control form-control-lg bg-light border-0 fs-6"
                             placeholder="John Doe"
                             required
-                            style={{fontSize: '1rem'}}
+                            autoComplete="name"
                         />
                     </div>
 
                     <div className="row">
                         <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark">Email</label>
+                            <label htmlFor="emailInput" className="form-label fw-bold text-dark">Email</label>
                             <input
+                                id="emailInput"
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="form-control form-control-lg bg-light border-0"
+                                className="form-control form-control-lg bg-light border-0 fs-6"
                                 placeholder="username@gmail.com"
                                 required
-                                style={{fontSize: '1rem'}}
+                                autoComplete="email"
                             />
                         </div>
 
                         <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark">Password</label>
+                            <label htmlFor="passwordInput" className="form-label fw-bold text-dark">Password</label>
                             <input
+                                id="passwordInput"
                                 type="password"
                                 name="loginPassword"
                                 value={formData.loginPassword}
                                 onChange={handleChange}
-                                className="form-control form-control-lg bg-light border-0"
+                                className="form-control form-control-lg bg-light border-0 fs-6"
                                 placeholder="***********"
                                 required
-                                style={{fontSize: '1rem'}}
+                                autoComplete="new-password"
                             />
                         </div>
                     </div>
@@ -144,7 +147,7 @@ const Register = () => {
                     <div className="row">
 
                         <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark d-block mb-2">Gender</label>
+                            <span className="form-label fw-bold text-dark d-block mb-2">Gender</span>
 
                             <div className="form-check form-check-inline">
                                 <input
@@ -193,60 +196,64 @@ const Register = () => {
                         </div>
 
                         <div className="col-md-6 mb-2">
-                            <label className="form-label fw-bold text-dark">Birthdate</label>
+                            <label htmlFor="birthdateInput" className="form-label fw-bold text-dark">Birthdate</label>
                             <input
+                                id="birthdateInput"
                                 type="date"
                                 name="birthDate"
                                 value={formData.birthDate}
                                 onChange={handleChange}
-                                className="form-control form-control-lg bg-light border-0"
+                                className="form-control form-control-lg bg-light border-0 fs-6"
                                 required
-                                style={{fontSize: '1rem'}}
+                                autoComplete="birthdate"
                             />
                         </div>
                     </div>
 
                     <div className="row">
                         <div className="col-sm mb-2">
-                            <label className="form-label fw-bold text-dark">Country</label>
+                            <label htmlFor="countryInput" className="form-label fw-bold text-dark">Country</label>
                             <input
+                                id="countryInput"
                                 type="text"
                                 name="country"
                                 value={formData.country}
                                 onChange={handleChange}
-                                className="form-control form-control-lg bg-light border-0"
+                                className="form-control form-control-lg bg-light border-0 fs-6"
                                 placeholder="Portugal"
                                 required
-                                style={{fontSize: '1rem'}}
+                                autoComplete="country-name"
                             />
                         </div>
 
                         <div className="col-sm mb-2">
-                            <label className="form-label fw-bold text-dark">City</label>
+                            <label htmlFor="cityInput" className="form-label fw-bold text-dark">City</label>
                             <input
+                                id="cityInput"
                                 type="text"
                                 name="city"
                                 value={formData.city}
                                 onChange={handleChange}
-                                className="form-control form-control-lg bg-light border-0"
+                                className="form-control form-control-lg bg-light border-0 fs-6"
                                 placeholder="Lisboa"
                                 required
-                                style={{fontSize: '1rem'}}
+                                autoComplete="address-level2"
                             />
                         </div>
 
                         <div className="col-sm mb-5">
-                            <label className="form-label fw-bold text-dark">Phone Number</label>
+                            <label htmlFor="phoneInput" className="form-label fw-bold text-dark">Phone Number</label>
                             <input
+                                id="phoneInput"
                                 type="tel"
                                 name="phoneNumber"
                                 value={formData.phoneNumber}
                                 onChange={handleChange}
-                                className="form-control form-control-lg bg-light border-0"
+                                className="form-control form-control-lg bg-light border-0 fs-6"
                                 placeholder="9xxxxxxxx"
                                 pattern="9[0-9]{8}"
                                 required
-                                style={{fontSize: '1rem'}}
+                                autoComplete="tel"
                             />
                         </div>
                     </div>
@@ -257,7 +264,7 @@ const Register = () => {
 
                     <p className="text-center fs-6">Do you have an account?
                         <Link to="/login">
-                            <button className="btn btn-link fs-6">Login</button>
+                            <button type="button" className="btn btn-link fs-6">Login</button>
                         </Link>
                     </p>
                 </form>
@@ -268,7 +275,7 @@ const Register = () => {
                 title={modal.title}
                 message={modal.message}
                 type={modal.type}
-                closeModal={handleCloseModal}
+                onClose={handleCloseModal}
             />
 
         </div>

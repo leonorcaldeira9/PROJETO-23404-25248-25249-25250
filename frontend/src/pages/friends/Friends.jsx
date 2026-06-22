@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from "../../components/navBar/navBar.jsx";
+import AlertModal from "../../components/alertModal/alertModal.jsx";
+import "../../pages/friends/friends.css"
 
 const FriendsPage = () => {
     const navigate = useNavigate();
@@ -13,6 +15,17 @@ const FriendsPage = () => {
     const [friends, setFriends] = useState([]);
     const [discoverableUsers, setDiscoverableUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: ''
+    });
+
+    const closeModal = () => {
+        setModal({ ...modal, isOpen: false });
+    };
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -96,13 +109,23 @@ const FriendsPage = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-
             setDiscoverableUsers(prevUsers => prevUsers.filter(user => user.id !== userIdToAdd));
-            alert("Friend request sent!");
+
+            setModal({
+                isOpen: true,
+                title: 'Sent',
+                message: "The request was sent successfully",
+                type: 'success'
+            });
         } catch (error) {
             console.error("Error sending friend request:", error);
             if (error.response?.status === 400) {
-                alert("This user is already pending or is already your friend!");
+                setModal({
+                    isOpen: true,
+                    title: 'Friend Request Failed',
+                    message: "This user is already pending or is already your friend!",
+                    type: 'error'
+                });
                 setDiscoverableUsers(prevUsers => prevUsers.filter(user => user.id !== userIdToAdd));
             }
         }
@@ -125,7 +148,7 @@ const FriendsPage = () => {
     const visibleDiscoverUsers = discoverableUsers.slice(0, 9);
 
     return (
-        <div className="background">
+        <div className="background pb-3">
             <Navbar/>
             <div className="container mt-4">
 
@@ -142,20 +165,18 @@ const FriendsPage = () => {
                     <div className="row g-3">
                         {friends.map((friend) => (
                             <div key={friend.id} className="col-12 col-md-6 col-lg-4">
-                                <div className="card shadow-sm border-0 d-flex flex-row align-items-center p-3"
-                                     style={{cursor: 'pointer'}}
+                                <div className="card shadow-sm border-0 d-flex flex-row align-items-center p-3 friend-card"
                                      onClick={() => handleViewProfile(friend.id)}
                                 >
 
-                                    <div style={{ position: 'relative', width: '50px', height: '50px', flexShrink: 0 }} className="me-3">
+                                    <div className="friend-avatar-wrapper me-3">
                                         <div className="bg-light rounded-circle d-flex justify-content-center align-items-center text-white w-100 h-100 position-absolute top-0 start-0">
                                             <i className="bi bi-person-circle text-secondary user-profile-picture-default"></i>
                                         </div>
                                         <img
                                             src={`users/${friend.id}.png`}
                                             alt={friend.fullName}
-                                            className="rounded-circle object-fit-cover position-absolute top-0 start-0 w-100 h-100"
-                                            style={{ zIndex: 1 }}
+                                            className="rounded-circle object-fit-cover position-absolute top-0 start-0 w-100 h-100 z-1"
                                             onError={(e) => { e.target.style.display = 'none'; }}
                                         />
                                     </div>
@@ -183,7 +204,6 @@ const FriendsPage = () => {
 
                 <hr className="my-5 text-secondary" />
 
-                {/* Discover Section */}
                 <h4 className="fw-bold mb-4">Discover</h4>
 
                 {visibleDiscoverUsers.length === 0 ? (
@@ -195,20 +215,18 @@ const FriendsPage = () => {
                     <div className="row g-3 mb-5">
                         {visibleDiscoverUsers.map((user) => (
                             <div key={user.id} className="col-12 col-md-6 col-lg-4">
-                                <div className="card shadow-sm border-0 d-flex flex-row align-items-center p-3"
-                                     style={{ cursor: 'pointer' }}
+                                <div className="card shadow-sm border-0 d-flex flex-row align-items-center p-3 friend-card"
                                      onClick={() => handleViewProfile(user.id)}
                                 >
 
-                                    <div style={{ position: 'relative', width: '50px', height: '50px', flexShrink: 0 }} className="me-3">
+                                    <div className="friend-avatar-wrapper me-3">
                                         <div className="bg-primary bg-opacity-25 rounded-circle d-flex justify-content-center align-items-center text-primary w-100 h-100 position-absolute top-0 start-0">
                                             <i className="bi bi-person-circle user-profile-picture-default"></i>
                                         </div>
                                         <img
                                             src={`users/${user.id}.png`}
                                             alt={user.fullName}
-                                            className="rounded-circle object-fit-cover position-absolute top-0 start-0 w-100 h-100"
-                                            style={{ zIndex: 1 }}
+                                            className="rounded-circle object-fit-cover position-absolute top-0 start-0 w-100 h-100 z-1"
                                             onError={(e) => { e.target.style.display = 'none'; }}
                                         />
                                     </div>
@@ -231,6 +249,13 @@ const FriendsPage = () => {
                     </div>
                 )}
             </div>
+            <AlertModal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                onClose={closeModal}
+            />
         </div>
     );
 };

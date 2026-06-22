@@ -10,9 +10,8 @@ const {
     getFriendsRequests,
     getBlockedUsersByUser
 } = require('../controllers/friendshipController');
-const authJWT = require("../middlewares/authJWT");
 
-/*router.get('/status/:userId/:friendId', authJWT(), getFriendshipStatus);*/
+const authJWT = require("../middlewares/authJWT");
 
 router.get('/requests/pending', authJWT(), getFriendsRequests);
 
@@ -26,7 +25,6 @@ router.post('/request', authJWT(), createFriendRequest);
 
 router.put('/update', authJWT(), updateFriendshipStatus);
 
-/*router.delete('/delete/:userId/:friendId', authJWT(), deleteFriendship);*/
 router.delete('/delete/:id', authJWT(), deleteFriendship);
 
 module.exports = router;

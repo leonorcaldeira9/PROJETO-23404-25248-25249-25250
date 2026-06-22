@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import logo from "../../assets/logo.png";
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import SettingsMenu from "../SettingsMenu/Settings.jsx";
-
+import AlertModal from "../alertModal/alertModal.jsx";
 
 const Navbar = () => {
 
@@ -21,6 +20,8 @@ const Navbar = () => {
     const token = localStorage.getItem('token');
 
     const navigate = useNavigate();
+
+    const [confirmLogout, setConfirmLogout] = useState(false);
 
     useEffect(() => {
         const updateName = () => {
@@ -52,15 +53,12 @@ const Navbar = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
-                // Get all pending requests
                 const allRequests = response.data;
 
-                // Filter to count ONLY the ones where you are the receiver
                 const incomingRequests = allRequests.filter(req =>
                     String(req.receiverId) === String(userId)
                 );
 
-                // Set the badge count to the incoming requests only
                 setNotificationCount(incomingRequests.length);
             } catch (error) {
                 console.error("Error fetching notifications count:", error);
@@ -77,10 +75,12 @@ const Navbar = () => {
     }, [token, userId]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userId');
+        setConfirmLogout(true);
+    };
 
+    const executeLogout = () => {
+        setConfirmLogout(false);
+        localStorage.clear();
         navigate('/login');
     };
 
@@ -121,12 +121,12 @@ const Navbar = () => {
                         </button>
                     </Link>
 
-                    {/*<button*/}
-                    {/*    className="btn btn-light border-0 rounded-circle  d-flex align-items-center justify-content-center nav-icons">*/}
-
-                    {/*    <i className="bi bi-gear fs-3 text-secondary"></i>*/}
-                    {/*</button>*/}
-                    <SettingsMenu onLogout={handleLogout} />
+                    <Link to={"/settings"}>
+                        <button
+                            className="btn btn-light border-0 rounded-circle d-flex align-items-center justify-content-center nav-icons">
+                            <i className="bi bi-gear fs-3 text-secondary"></i>
+                        </button>
+                    </Link>
 
                     <button onClick={handleLogout}
                         className="btn btn-light border-0 rounded-circle  d-flex align-items-center justify-content-center nav-icons">
@@ -142,8 +142,7 @@ const Navbar = () => {
                                 onClick={() => navigate('/profile')}
                                 src={photoUrl}
                                 alt={`Photo of ${name}`}
-                                className="w-100 h-100"
-                                style={{ objectFit: 'cover' }}
+                                className="w-100 h-100 user-profile-picture"
                                 onError={() => setImageError(true)}
                             />
                         )}
@@ -151,6 +150,15 @@ const Navbar = () => {
                     </button>
                 </div>
             </div>
+            <AlertModal
+                isOpen={confirmLogout}
+                title="Logout"
+                message="Are you sure you want to sign out of your account?"
+                type="error"
+                confirmText="Logout"
+                onClose={() => setConfirmLogout(false)}
+                onConfirm={executeLogout}
+            />
         </nav>
     );
 };

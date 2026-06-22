@@ -2,23 +2,6 @@ const CommentLikeModel = require('../models/CommentLikeModel');
 const CommentModel = require('../models/CommentModel');
 const {verifyPostAccess} = require("../utils/securityHelper");
 
-/*const getLikesByComment = (req, res) => {
-    const idComment = req.params.id;
-    //if (idComment === undefined) return res.status(400).send();
-
-    if (!idComment) {
-        return res.status(400).json({ error: "Comment ID is required." });
-    }
-
-    CommentLikeModel.getLikesByComment(idComment, (err, likes) => {
-        if (err) {
-            return res.status(500).json({ error: "Error searching for likes in the database." });
-        }
-
-        return res.status(200).json(likes);
-    });
-};*/
-
 const getLikesByComment = (req, res) => {
     const idComment = req.params.id;
     const idLoggedInUser = req.user.id;
@@ -42,22 +25,6 @@ const getLikesByComment = (req, res) => {
         });
     });
 };
-
-/*const getUsersLikeComment = (req, res) => {
-    const idComment = req.params.id;
-
-    if (!idComment) {
-        return res.status(400).json({ error: "Comment ID is required." });
-    }
-
-    CommentLikeModel.getUsersLikeComment(idComment, (err, users) => {
-        if (err) {
-            return res.status(500).json({ error: "Error searching for the users." });
-        }
-
-        return res.status(200).json(users);
-    });
-};*/
 
 const getUsersLikeComment = (req, res) => {
     const idComment = req.params.id;
@@ -85,27 +52,8 @@ const getUsersLikeComment = (req, res) => {
     });
 };
 
-/*const addLike = (req, res) => {
-
-    const idUser = req.user.id;
-    const { idComment } = req.body;
-
-    if (!idComment) {
-        return res.status(400).json({ error: "Comment ID is required." });
-    }
-
-    CommentLikeModel.addLike(idUser, idComment, (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: "Error adding the like." });
-        }
-
-        return res.json("Like added to the comment successfully.");
-    });
-};*/
 
 const addLike = (req, res) => {
-    /*const { idUser, idComment } = req.body;
-    if (!idUser || !idComment) return res.status(400).send();*/
 
     const idUser = req.user.id;
     const { idComment } = req.body;
@@ -130,8 +78,6 @@ const addLike = (req, res) => {
 };
 
 const removeLike = (req, res) => {
-    /*const { idUser, idComment } = req.params;
-    if (!idUser || !idComment) return res.status(400).send();*/
 
     const idUser = req.user.id;
     const { idComment } = req.params;

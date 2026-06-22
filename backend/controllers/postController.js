@@ -3,70 +3,6 @@ const {checkIfFriends} = require("../models/friendShipModel");
 const {getUserById} = require("../models/userModel");
 const {verifyPostAccess} = require("../utils/securityHelper");
 
-/*const getPostById = (req, res) => {
-    const id = req.params.id;
-
-    if (!id) {
-        return res.status(400).json({ error: "User ID is required." });
-    }
-
-    PostModel.getPostById(id, (err, post) => {
-        if (err) {
-            return res.status(500).json({ error: "Database error." });
-        }
-        if (post.length === 0) {
-            return res.status(404).json({ error: "Post not found." });
-        }
-        return res.status(200).json(post[0]);
-    });
-};*/
-
-/*const getPostById = (req, res) => {
-    const id = req.params.id;
-    const idLoggedInUser = req.user.id;
-
-
-    if (!id) {
-        return res.status(400).json({ error: "User ID is required." });
-    }
-
-    PostModel.getPostById(id, (err, post) => {
-        if (err) {
-            return res.status(500).json({ error: "Database error." });
-        }
-        if (post.length === 0) {
-            return res.status(404).json({ error: "Post not found." });
-        }
-
-        const targetPost = post[0];
-
-        if (targetPost.idUser === idLoggedInUser) {
-            return res.status(200).json(targetPost);
-        }
-
-        getUserById(targetPost.idUser, (err, user) => {
-            if (err) return res.status(500).json({ error: "Error checking user profile." });
-
-            const authorProfile = user[0];
-
-            if (authorProfile.privacy === 'pr' || targetPost.visibility === 'pr') {
-
-                checkIfFriends(idLoggedInUser, targetPost.idUser, (err, areFriends) => {
-                    if (err) return res.status(500).json({ error: "Error checking permissions." });
-
-                    if (!areFriends) {
-                        return res.status(403).json({ error: "Access denied. Private account or post." });
-                    }
-
-                    return res.status(200).json(targetPost);
-                });
-            } else {
-                return res.status(200).json(targetPost);
-            }
-        });
-    });
-};*/
-
 const getPostById = (req, res) => {
     const id = req.params.id;
     const idLoggedInUser = req.user.id;
@@ -79,25 +15,6 @@ const getPostById = (req, res) => {
         return res.status(200).json(targetPost);
     });
 };
-
-/*const getPostsByUser = (req, res) => {
-    const id = req.params.id;
-
-    if (!id) {
-        return res.status(400).json({ error: "User ID is required." });
-    }
-
-    PostModel.getPostsByUser(id, (err, posts) => {
-        if (err) {
-            return res.status(500).json({ error: "Database error." });
-        }
-        if (posts.length === 0) {
-            return res.status(404).json({ error: "No posts found for this user." });
-        }
-
-        return res.status(200).json(posts);
-    })
-}*/
 
 const getPostsByUser = (req, res) => {
     const idTargetUser = req.params.id;
@@ -116,10 +33,6 @@ const getPostsByUser = (req, res) => {
 
         checkIfFriends(idLoggedInUser, idTargetUser, (err, areFriends) => {
             if (err) return res.status(500).json({ error: "Error checking friendship." });
-
-            /*if (targetUser.privacy === 'pr' && !areFriends && !isSameUser) {
-                return res.status(403).json({ error: "This account is private. Only friends can see posts." });
-            }*/
 
             PostModel.getPostsByUser(idTargetUser, (err, posts) => {
                 if (err) {

@@ -1,8 +1,6 @@
 const FriendshipModel = require('../models/FriendshipModel');
 
 const getFriendshipStatus = (req, res) => {
-    /*const { userId, friendId } = req.params;
-    if (userId === undefined || friendId === undefined) return res.status(400).send();*/
 
     const userId = req.user.id;
     const { friendId } = req.params;
@@ -30,7 +28,6 @@ const getFriendshipStatus = (req, res) => {
 
 const getFriendsByUser = (req, res) => {
     const  userId  = req.params.id;
-    /*if (userId === undefined) return res.status(400).send("Este erro nao é fixe");*/
 
     if (!userId) {
         return res.status(400).json({ error: "User ID is required." });
@@ -70,8 +67,6 @@ const getBlockedUsersByUser = (req, res) => {
 };
 
 const createFriendRequest = (req, res) => {
-    /*const { userId, friendId } = req.body;
-    if (!userId || !friendId) return res.status(400).send();*/
 
     const  userId  = req.user.id;
     const { friendId } = req.body;
@@ -91,32 +86,6 @@ const createFriendRequest = (req, res) => {
         return res.status(201).json({ message: "Friend request sent successfully." });
     });
 };
-
-/*const updateFriendshipStatus = (req, res) => {
-
-    const userWithRequestId = req.user.id;
-    const { friendId, friendshipStatus } = req.body;
-
-    if (!friendId || !friendshipStatus) {
-        return res.status(400).json({ error: "The friend's ID and friendship status are required." });
-    }
-
-    if (userWithRequestId === parseInt(friendId)) {
-        return res.status(400).json({ error: "You cannot change the state of your friendship with yourself." });
-    }
-
-    FriendshipModel.updateFriendshipStatus(friendId, userWithRequestId, friendshipStatus, (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: "Error updating friendship status." });
-        }
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Friendship request not found." });
-        }
-
-        return res.status(200).json({ message: `Friendship status updated to ${friendshipStatus}.` });
-    });
-};*/
 
 const updateFriendshipStatus = (req, res) => {
     const userWithRequestId = req.user.id;
@@ -151,8 +120,6 @@ const updateFriendshipStatus = (req, res) => {
 };
 
 const deleteFriendship = (req, res) => {
-    /*const { userId, friendId } = req.params;
-    if (!userId || !friendId) return res.status(400).send();*/
 
     const userId = req.user.id;
     const friendId = req.params.id;

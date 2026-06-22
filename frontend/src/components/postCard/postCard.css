@@ -13,6 +13,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 1;
 }
 
 .cursor-pointer{
@@ -25,4 +26,8 @@
 
 .dots-button-style {
     cursor: pointer;
+}
+
+.dropdown-menu-size {
+    min-width: 200px;
 }

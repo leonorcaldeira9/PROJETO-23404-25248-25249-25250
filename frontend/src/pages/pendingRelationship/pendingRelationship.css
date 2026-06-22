@@ -1,3 +1,20 @@
 .cursor-pointer {
     cursor: pointer;
 }
+
+.page {
+    min-height: 100vh;
+}
+
+.settings-container {
+    max-width: 1000px;
+}
+
+.avatar-box {
+    width: 45px;
+    height: 45px;
+}
+
+.icon {
+    font-size: 35px;
+}

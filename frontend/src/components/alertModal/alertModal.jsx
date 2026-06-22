@@ -2,7 +2,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import './alertModal.css'
 import { useEffect } from "react";
 
-const AlertModal = ({ isOpen, title, message, type, onClose, onConfirm }) => {
+const AlertModal = ({ isOpen, title, message, type, onClose, onConfirm, confirmText }) => {
 
     useEffect(() => {
         if (!isOpen || onConfirm) return;
@@ -45,7 +45,7 @@ const AlertModal = ({ isOpen, title, message, type, onClose, onConfirm }) => {
                                     Cancel
                                 </button>
                                 <button type="button" className={`btn ${colorButton} w-50 py-2 fw-semibold alert-modal-btn`} onClick={onConfirm}>
-                                    Delete
+                                    {confirmText || "Confirm"}
                                 </button>
                             </div>
                         ) : (

@@ -6,8 +6,12 @@
     row-gap: 20px;
 }
 
-.optionCard {
+.option-card {
     max-height: calc(100vh - 100px);
     position: sticky;
     overflow-y: auto;
+}
+
+.text-profile {
+    color: rgb(154, 148, 223);
 }

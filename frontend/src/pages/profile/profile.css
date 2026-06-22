@@ -32,4 +32,13 @@
 
 .sub-card {
     margin-top: 70px;
+    padding-top: 20px;
+}
+
+.profile-img {
+    object-fit: cover;
+}
+
+.timeline-container {
+    max-width: 800px;
 }

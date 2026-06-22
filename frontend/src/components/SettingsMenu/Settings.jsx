@@ -58,9 +58,7 @@ const SettingsMenu = ({ onLogout }) => {
 
             {isOpen && (
                 <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm" style={{ minWidth: '200px' }}>
-                    {/*<button className="dropdown-item d-flex align-items-center" onClick={handleEditProfile}>*/}
-                    {/*    <i className="bi bi-pencil-square me-2 text-secondary"></i> Edit Profile*/}
-                    {/*</button>*/}
+
                     <Link
                         to="/EditProfile"
                         className="dropdown-item d-flex align-items-center text-decoration-none"

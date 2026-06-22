@@ -1,10 +1,6 @@
 const db = require('../db_connection/db');
 
 const CommentLikeModel = {
-    /*getLikesByComment: (idComment, callback) => {
-        const sql = 'SELECT * FROM comments_likes WHERE idComment=?';
-        db.query(sql, [idComment], callback);
-    },*/
 
     getLikesByComment: (idComment, callback) => {
         const sql = 'SELECT count(*) AS totalLikes FROM comments_likes WHERE idComment=?';

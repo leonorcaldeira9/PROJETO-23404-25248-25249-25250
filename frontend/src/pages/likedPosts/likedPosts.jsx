@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import PostCard from '../../components/postCard/postCard.jsx';
 import Navbar from "../../components/navBar/navBar.jsx";
+import "../../pages/likedPosts/likedPosts.css"
 
 const LikedPosts = () => {
     const token = localStorage.getItem('token');
@@ -70,7 +71,7 @@ const LikedPosts = () => {
 
             <div className="d-flex align-items-center justify-content-between mb-4 bg-white p-3 rounded shadow-sm">
                 <h5 className="fw-bold text-dark mb-0 d-flex align-items-center">
-                    <div className="bg-danger bg-opacity-10 p-2 rounded-circle me-3 d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                    <div className="bg-danger bg-opacity-10 p-2 rounded-circle me-3 d-flex align-items-center justify-content-center like-icon">
                         <i className="bi bi-heart-fill text-danger fs-5"></i>
                     </div>
                     Liked Posts
@@ -84,7 +85,7 @@ const LikedPosts = () => {
                 )}
             </div>
 
-            <div className="container mt-4 pb-5" style={{ maxWidth: '680px' }}>
+            <div className="container mt-4 pb-5 feed-container">
 
 
                 {isLoading ? (

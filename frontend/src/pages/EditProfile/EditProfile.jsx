@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../../components/navBar/navBar.jsx';
+import AlertModal from "../../components/alertModal/alertModal.jsx";
 
 const EditProfile = () => {
     const navigate = useNavigate();
@@ -21,9 +22,23 @@ const EditProfile = () => {
         privacy: ''
     });
 
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: ''
+    });
+
+    const closeModal = () => {
+        setModal({ ...modal, isOpen: false });
+
+        if (modal.type === 'success') {
+            navigate('/profile');
+        }
+    };
+
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [message, setMessage] = useState({ text: '', type: '' });
 
     useEffect(() => {
         if (!token) {
@@ -56,7 +71,12 @@ const EditProfile = () => {
 
             } catch (error) {
                 console.error("Error fetching user data:", error);
-                setMessage({ text: 'Erro ao carregar os teus dados.', type: 'danger' });
+                setModal({
+                    isOpen: true,
+                    title: 'Load Failed',
+                    message: "It was not possible to load your data. Refresh the page.",
+                    type: 'error'
+                });
             } finally {
                 setIsLoading(false);
             }
@@ -101,29 +121,23 @@ const EditProfile = () => {
             window.dispatchEvent(new Event('perfilAtualizado'));
 
 
-            setMessage({ text: 'Perfil atualizado com sucesso!', type: 'success' });
-
-            setTimeout(() => {
-                navigate(`/profile`);
-            }, 1500);
+            setModal({
+                isOpen: true,
+                title: 'Success!',
+                message: 'Your profile was updated successfully.',
+                type: 'success'
+            });
 
         } catch (error) {
 
-            console.log("DEBUG: Full Error Object ->", error);
+            console.error("Error saving the updates:", error);
 
-            if (error.response) {
-                console.log("Status Code:", error.response.status);
-                console.log("Error Data:", error.response.data);
-                setMessage({ text: 'Erro ao salvar as alterações. Verifica os dados.', type: 'danger' });
-            } else if (error.request) {
-                console.log("DEBUG: No response received. Check if backend is running on port 3001.");
-                setMessage({ text: 'O servidor não respondeu. Verifica se o backend está ligado.', type: 'danger' });
-            } else {
-                console.log("DEBUG: Request Setup Error ->", error.message);
-                setMessage({ text: 'Erro interno ao preparar o pedido.', type: 'danger' });
-            }
-
-            setMessage({ text: 'Erro ao salvar as alterações.', type: 'danger' });
+            setModal({
+                isOpen: true,
+                title: 'Update Failed',
+                message: error.response?.data?.error || "An error occurred while saving the changes. Check the data.",
+                type: 'error'
+            });
         } finally {
             setIsSaving(false);
         }
@@ -140,12 +154,6 @@ const EditProfile = () => {
             <div className="container mt-5 mb-5" style={{ maxWidth: '800px' }}>
                 <div className="card shadow-sm border-0 p-4">
                     <h3 className="fw-bold mb-4 text-dark">Edit Profile</h3>
-
-                    {message.text && (
-                        <div className={`alert alert-${message.type} small py-2`} role="alert">
-                            {message.text}
-                        </div>
-                    )}
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
@@ -333,6 +341,14 @@ const EditProfile = () => {
                     </form>
                 </div>
             </div>
+
+            <AlertModal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                onClose={closeModal}
+            />
         </div>
     );
 };

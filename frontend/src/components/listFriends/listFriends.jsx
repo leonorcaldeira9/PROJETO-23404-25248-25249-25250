@@ -13,8 +13,7 @@ const FriendAvatar = ({ friend }) => {
             <img
                 src={`/users/${friend.id}.png`}
                 alt={friend.fullName}
-                className="rounded-circle border"
-                style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                className="rounded-circle border friend-avatar-picture"
                 onError={() => setHasError(true)}
             />
         );
@@ -22,11 +21,10 @@ const FriendAvatar = ({ friend }) => {
 
     return (
         <div
-            className="d-flex align-items-center justify-content-center rounded-circle border bg-light text-secondary"
-            style={{ width: '40px', height: '40px' }}
+            className="friend-avatar-error d-flex align-items-center justify-content-center rounded-circle border bg-light text-secondary"
             title={friend.fullName}
         >
-            <i className="bi bi-person-circle" style={{ fontSize: '24px' }}></i>
+            <i className="bi bi-person-circle friend-avatar-icon"></i>
         </div>
     );
 };
@@ -71,7 +69,7 @@ const FriendsListWidget = () => {
     }
 
     return (
-        <div className="card shadow-sm border-0 p-3 friendsCard">
+        <div className="card shadow-sm border-0 p-3 friends-card">
             <h6 className="fw-bold mb-3">
                 <i className="bi bi-people-fill me-2 text-primary"></i>
                 Friends ({friends.length})
@@ -83,15 +81,15 @@ const FriendsListWidget = () => {
                 ) : (
                     friends.map((friend) => (
                         <div key={friend.id} className="d-flex align-items-center justify-content-between">
-                            <Link to={`/profile/${friend.id}`} className="d-flex align-items-center gap-2 text-decoration-none text-dark" style={{ cursor: 'pointer' }}>
+                            <Link to={`/profile/${friend.id}`} className="d-flex align-items-center gap-2 text-decoration-none text-dark profile-friend-link">
 
                                 <FriendAvatar friend={friend} />
 
                                 <div>
-                                    <p className="mb-0 small fw-semibold text-truncate friendName">
+                                    <p className="mb-0 small fw-semibold text-truncate friend-name">
                                         {friend.fullName}
                                     </p>
-                                    <p className="mb-0 text-muted x-small friendCity">
+                                    <p className="mb-0 text-muted x-small friend-city">
                                         {friend.city || 'No location'}
                                     </p>
                                 </div>

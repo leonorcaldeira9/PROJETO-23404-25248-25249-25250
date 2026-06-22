@@ -2,7 +2,6 @@ const db = require('../db_connection/db');
 
 const PostModel = {
     getPostById: (id, callback) => {
-        //const sql = 'SELECT * FROM posts WHERE id=?';
         const sql = 'SELECT P.*,U.fullName FROM posts AS P JOIN users as U on U.id=P.idUser WHERE P.id=?';
         db.query(sql, [id], callback);
     },

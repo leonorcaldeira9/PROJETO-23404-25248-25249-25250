@@ -7,14 +7,14 @@ const OptionsListWidget = () => {
     const navigate = useNavigate();
 
     const menuOptions = [
-        { id: 1, name: 'Profile', icon: 'bi-person-fill text-success', path: '/profile' },
+        { id: 1, name: 'Profile', icon: 'bi-person-fill text-profile', path: '/profile' },
         { id: 2, name: 'Friends', icon: 'bi-people-fill text-info', path: '/friends' },
         { id: 3, name: 'Posts Liked', icon: 'bi-heart-fill text-danger', path: '/likedPosts' },
         { id: 4, name: 'Settings', icon: 'bi-gear-fill text-secondary', path: '/settings' }
     ];
 
     return (
-        <div className="card shadow-sm border-0 p-3 optionCard">
+        <div className="card shadow-sm border-0 p-3 option-card">
             <h6 className="fw-bold mb-3">
                 Options
             </h6>

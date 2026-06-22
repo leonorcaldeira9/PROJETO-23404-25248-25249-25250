@@ -1,14 +1,32 @@
-.friendsCard{
+.friends-card{
     max-height: calc(100vh - 100px);
     position: sticky;
     overflow-y: auto;
 }
 
-.friendName{
+.friend-name{
     max-width: 140px;
 }
 
-.friendCity{
+.friend-city{
     font-size: 11px;
 }
 
+.friend-avatar-picture {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.friend-avatar-error {
+    width: 40px;
+    height: 40px;
+}
+
+.friend-avatar-icon {
+    font-size: 24px;
+}
+
+.profile-friend-link {
+    cursor: pointer;
+}

@@ -19,11 +19,6 @@ const FriendshipModel = {
         db.query(sql, [userId], callback);
     },
 
-    /*createFriendRequest: (userId, friendId, callback) => {
-        const sql = 'INSERT INTO friendship (userId, friendId, friendshipStatus) VALUES (?, ?, "P")';
-        db.query(sql, [userId, friendId], callback);
-    },*/
-
     createFriendRequest: (userId, friendId, callback) => {
         const checkBlockSql = `SELECT * FROM friendship WHERE userId=? AND friendId=? AND friendshipStatus='B'`;
         db.query(checkBlockSql, [friendId, userId], (err, rows) => {
@@ -108,11 +103,6 @@ const FriendshipModel = {
             }
         });
     },
-
-    /*getPendingRequests: (idUser, callback) => {
-        const sql = 'SELECT U.id, U.fullName, U.email, F.friendDate FROM friendship AS F JOIN users AS U ON U.id = F.userId AND U.id != ? WHERE ( F.friendId = ?) AND F.friendshipStatus = "P"';
-        db.query(sql, [idUser, idUser], callback);
-    }*/
 
     getPendingRequests: (idUser, callback) => {
         const sql = 'SELECT U.id, U.fullName, U.email, F.friendDate, F.userId AS senderId, F.friendId AS receiverId FROM friendship AS F JOIN users AS U ON (U.id = F.userId OR U.id = F.friendId) WHERE (F.userId = ? OR F.friendId = ?) AND U.id != ? AND F.friendshipStatus = "P"';

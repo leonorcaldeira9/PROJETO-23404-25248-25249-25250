@@ -52,7 +52,6 @@ const createUser=(req,res)=>{
 }
 
 
-
 const loginUser = (req, res) => {
     const { email, loginPassword } = req.body;
 
@@ -99,10 +98,6 @@ const updateUser = (req, res) => {
     const id=req.params.id;
     const loggedInUserId = req.user.id;
 
-    /*if (id===undefined) {
-        return res.status(400).send()
-    }*/
-
     if (!id) {
         return res.status(400).json({ error: "User ID is required." });
     }
@@ -143,38 +138,11 @@ const updateUser = (req, res) => {
             return res.status(200).json({ message: `User ${id} updated successfully.` });
         });
     }
-
-
-
-
-    /*const encryptSecurityLevel = 10;
-
-    bcrypt.hash(req.body.loginPassword, encryptSecurityLevel, (err, hash) => {
-        if (err) return res.status(500).json({ error: "Error checking password." });
-
-        req.body.loginPassword = hash;
-
-        UserModel.updateUser(id,req.body,(err,result)=>{
-            if(err){
-                return res.status(500).json({ error: "Error updating." });
-            }
-
-            if(result.affectedRows === 0) {
-                return res.status(404).json({ error: "User not found." });
-            }
-
-            return res.status(200).json({ message: `User ${id} updated successfully.` });
-        })
-    });*/
 };
 
 const deleteUser = (req, res) => {
     const  id  = req.params.id;
     const loggedInUserId = req.user.id;
-
-    /*if (id===undefined) {
-        return res.status(400).json({ error: "User ID is required." })
-    }*/
 
     if (!id) {
         return res.status(400).json({ error: "User ID is required." });

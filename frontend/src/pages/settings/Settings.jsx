@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../../components/navBar/navBar.jsx';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import AlertModal from "../../components/alertModal/alertModal.jsx";
 
 const SettingsPage = () => {
     const navigate = useNavigate();
@@ -11,35 +12,67 @@ const SettingsPage = () => {
 
     const [isDeleting, setIsDeleting] = useState(false);
 
-    const handleDeleteAccount = async () => {
-        const confirmDelete = window.confirm("Are you absolutely sure? This action cannot be undone and you will lose all your data!");
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: ''
+    });
 
-        if (!confirmDelete) return;
-
-        const doubleCheck = window.confirm("Final warning: Press OK to delete your account forever.");
-        if (!doubleCheck) return;
-
-        setIsDeleting(true);
-
-        try {
-            await axios.delete(`http://localhost:3001/users/delete/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            localStorage.clear();
-            alert("Account successfully deleted. Goodbye!");
+    const closeModal = () => {
+        setModal({ ...modal, isOpen: false });
+        if (modal.type === 'success') {
             navigate('/login');
-
-        } catch (error) {
-            console.error("Error deleting account:", error);
-            alert("Error trying to delete your account. Try again later.");
-            setIsDeleting(false);
         }
     };
 
-    const handleLogout = () => {
-        localStorage.clear();
-        navigate('/login');
+    const triggerLogout = () => {
+        setConfirmAction({ isOpen: true, type: 'logout' });
+    };
+
+    const triggerDeleteAccount = () => {
+        setConfirmAction({ isOpen: true, type: 'delete' });
+    };
+
+    const [confirmAction, setConfirmAction] = useState({ isOpen: false, targetUserId: null, type: null });
+
+
+    const handleConfirmAction = async () => {
+        const actionType = confirmAction.type;
+        setConfirmAction({ isOpen: false, type: null });
+
+        if (actionType === 'logout') {
+            localStorage.clear();
+            navigate('/login');
+
+        } else if (actionType === 'delete') {
+            setIsDeleting(true);
+
+            try {
+                await axios.delete(`http://localhost:3001/users/delete/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                localStorage.clear();
+
+                setModal({
+                    isOpen: true,
+                    title: 'Goodbye!',
+                    message: "Account successfully deleted. We are sorry to see you go!",
+                    type: 'success'
+                });
+
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: "Error trying to delete your account. Try again later.",
+                    type: 'error'
+                });
+                setIsDeleting(false);
+            }
+        }
     };
 
     return (
@@ -70,7 +103,7 @@ const SettingsPage = () => {
                             </div>
                         </Link>
 
-                        <button onClick={handleLogout} className="list-group-item list-group-item-action d-flex align-items-center py-3 border rounded shadow-sm text-start mt-2">
+                        <button onClick={triggerLogout} className="list-group-item list-group-item-action d-flex align-items-center py-3 border rounded shadow-sm text-start mt-2">
                             <i className="bi bi-box-arrow-right fs-3 text-secondary me-3"></i>
                             <div>
                                 <h6 className="mb-0 fw-bold">Logout</h6>
@@ -81,7 +114,7 @@ const SettingsPage = () => {
                         <div className="mt-5">
                             <h6 className="text-danger fw-bold mb-2 px-1">Danger Zone</h6>
                             <button
-                                onClick={handleDeleteAccount}
+                                onClick={triggerDeleteAccount}
                                 disabled={isDeleting}
                                 className="list-group-item list-group-item-action d-flex align-items-center py-3 text-start list-group-item-danger border border-danger rounded shadow-sm"
                             >
@@ -96,6 +129,25 @@ const SettingsPage = () => {
                     </div>
                 </div>
             </div>
+
+            <AlertModal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                onClose={closeModal}
+            />
+
+            <AlertModal
+                isOpen={confirmAction.isOpen}
+                title={confirmAction.type === 'logout' ? "Logout" : "Delete Account"}
+                message={confirmAction.type === 'logout'
+                    ? "Are you sure you want to sign out of your account?"
+                    : "Are you absolutely sure? This action cannot be undone and you will lose all your data forever!"}
+                type="error"
+                onClose={() => setConfirmAction({ isOpen: false, type: null })}
+                onConfirm={handleConfirmAction}
+            />
         </div>
     );
 };

@@ -17,7 +17,6 @@ const PostLikeModel = {
     },
 
     getPostLikesByUser: (id, callback)=>{
-        // const sql = 'SELECT P.* FROM posts_likes AS PL JOIN posts AS P ON PL.idPost=P.id WHERE idUser=? ';
         const sql = 'SELECT P.* FROM posts_likes AS PL JOIN posts AS P ON PL.idPost = P.id WHERE PL.idUser = ? ORDER BY PL.likeDate DESC';
         db.query(sql, [id], callback);
 
