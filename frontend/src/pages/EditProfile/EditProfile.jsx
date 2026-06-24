@@ -54,8 +54,6 @@ const EditProfile = () => {
 
                 const userData = response.data;
 
-                console.log("DEBUG: Fetched User Data ->", userData);
-
                 setFormData({
                     fullName: userData.fullName || '',
                     email: userData.email || '',
@@ -96,7 +94,6 @@ const EditProfile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
-        setMessage({ text: '', type: '' });
 
         const payload = { ...formData };
 
