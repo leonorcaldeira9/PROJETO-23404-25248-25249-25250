@@ -10,25 +10,31 @@ import LikedPosts   from "./pages/likedPosts/likedPosts.jsx";
 import FriendsPage from "./pages/friends/Friends.jsx";
 import Notifications from "./pages/notifications/Notifications.jsx";
 import PendingRelationshipPage from "./pages/pendingRelationship/PendingRelationship.jsx";
+import InterceptorError from "./components/auth/InterceptorError.jsx";
+import SessionExpiredHandler from "./components/auth/SessionExpiredHandler.jsx";
 
 function App() {
   return (
       <BrowserRouter>
-        <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/:id" element={<Profile />} />
-            <Route path="/post/:id" element={<PostPage />} />
-            <Route path="/EditProfile" element={<EditProfile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/likedPosts" element={<LikedPosts />} />
-            <Route path = "/friends" element={<FriendsPage/>} />
-            <Route path = "/notifications" element={<Notifications/>} />
-            <Route path = "/pendingRelationship" element={<PendingRelationshipPage/>} />
-        </Routes>
+          <InterceptorError>
+              <SessionExpiredHandler>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/login" replace />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/feed" element={<Feed />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile/:id" element={<Profile />} />
+                    <Route path="/post/:id" element={<PostPage />} />
+                    <Route path="/EditProfile" element={<EditProfile />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/likedPosts" element={<LikedPosts />} />
+                    <Route path = "/friends" element={<FriendsPage/>} />
+                    <Route path = "/notifications" element={<Notifications/>} />
+                    <Route path = "/pendingRelationship" element={<PendingRelationshipPage/>} />
+                </Routes>
+              </SessionExpiredHandler>
+          </InterceptorError>
       </BrowserRouter>
   )
 }
