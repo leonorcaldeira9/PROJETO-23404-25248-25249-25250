@@ -8,7 +8,7 @@ const getPostById = (req, res) => {
     const idLoggedInUser = req.user.id;
 
     if (!id) {
-        return res.status(400).json({ error: "User ID is required." });
+        return res.status(400).json({ error: "Post ID is required." });
     }
 
     verifyPostAccess(id, idLoggedInUser, res, (targetPost) => {

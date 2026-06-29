@@ -5,8 +5,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 
-const PORT = 3001;
-
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/userRoute');
 const postsRouter = require('./routes/postRoute');
@@ -47,10 +45,6 @@ app.use(function(err, req, res, next) {
 
   res.status(err.status || 500);
   res.render('error');
-});
-
-app.listen(PORT, () => {
-  console.log('Servidor Express a correr na porta 3001!');
 });
 
 module.exports = app;

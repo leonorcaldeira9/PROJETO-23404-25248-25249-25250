@@ -92,7 +92,7 @@ const removeLike = (req, res) => {
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Comment not found." });
+            return res.status(404).json({ error: "Like of the comment not found." });
         }
 
         return res.status(200).json({ message: "Like removed from comment successfully."});
