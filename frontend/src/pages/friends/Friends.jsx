@@ -152,7 +152,6 @@ const FriendsPage = () => {
             <Navbar/>
             <div className="container mt-4">
 
-                {/* Friends Section */}
                 <h4 className="fw-bold mb-4">My Friends</h4>
 
                 {friends.length === 0 ? (
