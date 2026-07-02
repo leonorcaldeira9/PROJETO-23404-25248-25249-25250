@@ -308,6 +308,7 @@ const Profile = () => {
                                                 key={postCompleto.id}
                                                 post={postCompleto}
                                                 token={token}
+                                                onPostUpdate={fetchUserPosts}
                                             />
                                         );
                                     })}

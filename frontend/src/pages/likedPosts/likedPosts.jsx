@@ -101,6 +101,7 @@ const LikedPosts = () => {
                                 key={post.id}
                                 post={post}
                                 token={token}
+                                onPostUpdate={fetchLikedPosts}
                             />
                         ))}
                     </div>

@@ -412,7 +412,7 @@ const PostPage = () => {
                         </button>
 
 
-                        {post && <PostCard post={post} token={token} viewComments={true} />}
+                        {post && <PostCard post={post} token={token} viewComments={true} onPostUpdate={fetchPostData} />}
 
                         <div className="card shadow-sm border-0 p-4 mt-2 mb-5">
                             <h5 className="fw-bold mb-4">Comments ({comments.length})</h5>
