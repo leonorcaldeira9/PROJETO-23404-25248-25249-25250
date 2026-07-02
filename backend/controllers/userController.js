@@ -75,7 +75,7 @@ const loginUser = (req, res) => {
         if (err) return res.status(500).send();
 
         if (results.length === 0) {
-            return res.status(401).json({ error: "User not found." });
+            return res.status(404).json({ error: "User not found." });
         }
 
         const user = results[0];
